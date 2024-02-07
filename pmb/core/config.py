@@ -69,7 +69,7 @@ class Config:
         "systemd": "http://mirror.postmarketos.org/postmarketos/staging/systemd/",
     }
     qemu_redir_stdio: bool = False
-    ssh_key_glob: str = "~/.ssh/id_*.pub"
+    ssh_key_glob: str = "~/.ssh/*.pub"
     ssh_keys: bool = False
     sudo_timer: bool = False
     systemd: SystemdConfig = SystemdConfig.DEFAULT

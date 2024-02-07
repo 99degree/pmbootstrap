@@ -284,7 +284,7 @@ implementation you want to use.
 ### Select SSH keys to include and make authorized in new images
 
 If the config file option `ssh_keys` is set to `True` (it defaults to `False`),
-then all files matching the glob `~/.ssh/id_*.pub` will be placed in
+then all files matching the glob `~/.ssh/*.pub` will be placed in
 `~/.ssh/authorized_keys` in the user's home directory in newly-built images.
 
 Sometimes, for example if you have a large number of SSH keys, you may wish to
