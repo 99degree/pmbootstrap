@@ -639,8 +639,8 @@ def ask_for_hostname(default: str | None, device: str) -> str:
         return ret
 
 
-def ask_for_ssh_keys(default: bool) -> bool:
-    if not len(glob.glob(os.path.expanduser("~/.ssh/id_*.pub"))):
+def ask_for_ssh_keys(ssh_key_glob: str, default: bool) -> bool:
+    if not len(glob.glob(os.path.expanduser(ssh_key_glob))):
         return False
     return pmb.helpers.cli.confirm(
         "Would you like to copy your SSH public keys to the device?", default=default
@@ -783,7 +783,7 @@ def frontend(args: PmbArgs) -> None:
     config.hostname = ask_for_hostname(config.hostname, device)
 
     # SSH keys
-    config.ssh_keys = ask_for_ssh_keys(config.ssh_keys)
+    config.ssh_keys = ask_for_ssh_keys(config.ssh_key_glob, config.ssh_keys)
 
     # pmaports path (if users change it with: 'pmbootstrap --aports=... init')
     config.aports = get_context().config.aports
