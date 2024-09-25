@@ -716,20 +716,12 @@ def arguments_repo_bootstrap(subparser):
 
 
 def arguments_repo_missing(subparser):
-    ret = subparser.add_parser("repo_missing")
-    package = ret.add_argument(
-        "package", nargs="?", help="only look at a" " specific package and its dependencies"
+    ret = subparser.add_parser(
+        "repo_missing",
+        help="list all packages + depends from pmaports for building the repository (used by bpo)",
     )
-    if "argcomplete" in sys.modules:
-        package.completer = package_completer
     ret.add_argument(
         "--arch", choices=Arch.supported(), default=Arch.native(), type=lambda x: Arch.from_str(x)
-    )
-    ret.add_argument(
-        "--built", action="store_true", help="include packages which exist in the binary repos"
-    )
-    ret.add_argument(
-        "--overview", action="store_true", help="only print the pkgnames without any details"
     )
     return ret
 

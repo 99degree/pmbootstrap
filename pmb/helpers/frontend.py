@@ -284,7 +284,10 @@ def config(args: PmbArgs) -> None:
 
 
 def repo_missing(args: PmbArgs) -> None:
-    missing = pmb.helpers.repo_missing.generate(args.arch, args.overview, args.package, args.built)
+    if not args.arch:
+        raise RuntimeError("args must not be None")  # for mypy
+
+    missing = pmb.helpers.repo_missing.generate(args.arch)
     print(json.dumps(missing, indent=4))
 
 
