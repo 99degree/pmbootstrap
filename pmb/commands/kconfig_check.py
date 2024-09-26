@@ -17,13 +17,13 @@ class KConfigCheck(commands.Command):
     packages: list[str]
     keep_going: bool
 
-    def __init__(self, details, file, packages, keep_going):
+    def __init__(self, details, file, packages, keep_going) -> None:
         self.details = details
         self.file = file
         self.packages = packages
         self.keep_going = keep_going
 
-    def run(self):
+    def run(self) -> None:
         # Build the components list from cli arguments (--waydroid etc.)
         components_list: list[str] = []
         error_msg = "kconfig check failed! More info: https://postmarketos.org/kconfig"

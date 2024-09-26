@@ -27,7 +27,6 @@ import pmb.helpers.devices
 import pmb.helpers.git
 import pmb.helpers.lint
 import pmb.helpers.logging
-import pmb.helpers.pkgrel_bump
 import pmb.helpers.pmaports
 import pmb.helpers.repo
 import pmb.helpers.repo_missing
@@ -499,24 +498,6 @@ def apkindex_parse(args: PmbArgs) -> None:
             raise RuntimeError(f"Package not found in the APKINDEX: {args.package}")
         result = result[args.package]
     print(json.dumps(result, indent=4))
-
-
-def pkgrel_bump(args: PmbArgs) -> None:
-    would_bump = True
-    if args.auto:
-        would_bump = bool(pmb.helpers.pkgrel_bump.auto(args, args.dry))
-    else:
-        # Each package must exist
-        for package in args.packages:
-            pmb.helpers.pmaports.find(package)
-
-        # Increase pkgrel
-        for package in args.packages:
-            pmb.helpers.pkgrel_bump.package(args, package, dry=args.dry)
-
-    if args.dry and would_bump:
-        logging.info("Pkgrels of package(s) would have been bumped!")
-        sys.exit(1)
 
 
 def aportupgrade(args: PmbArgs) -> None:

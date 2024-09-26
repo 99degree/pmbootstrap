@@ -3,7 +3,6 @@
 from pmb.core.arch import Arch
 from pmb.helpers import logging
 
-from pmb.types import PmbArgs
 import pmb.helpers.file
 import pmb.helpers.pmaports
 import pmb.helpers.repo
@@ -11,7 +10,7 @@ import pmb.parse
 import pmb.parse.apkindex
 
 
-def package(args: PmbArgs, pkgname: str, reason="", dry: bool = False) -> None:
+def package(pkgname: str, reason="", dry: bool = False) -> None:
     """Increase the pkgrel in the APKBUILD of a specific package.
 
     :param pkgname: name of the package
@@ -54,7 +53,7 @@ def package(args: PmbArgs, pkgname: str, reason="", dry: bool = False) -> None:
         )
 
 
-def auto_apkindex_package(args: PmbArgs, arch, aport, apk, dry: bool = False) -> bool:
+def auto_apkindex_package(arch, aport, apk, dry: bool = False) -> bool:
     """Bump the pkgrel of a specific package if it is outdated in the given APKINDEX.
 
     :param arch: the architecture, e.g. "armhf"
@@ -103,13 +102,13 @@ def auto_apkindex_package(args: PmbArgs, arch, aport, apk, dry: bool = False) ->
 
     # Increase pkgrel
     if len(missing):
-        package(args, pkgname, reason=", missing depend(s): " + ", ".join(missing), dry=dry)
+        package(pkgname, reason=", missing depend(s): " + ", ".join(missing), dry=dry)
         return True
 
     return False
 
 
-def auto(args: PmbArgs, dry=False) -> list[str]:
+def auto(dry=False) -> list[str]:
     """:returns: list of aport names, where the pkgrel needed to be changed"""
     ret = []
     for arch in Arch.supported():
@@ -128,6 +127,6 @@ def auto(args: PmbArgs, dry=False) -> list[str]:
                     logging.warning(f"{pkgname}: origin '{origin}' aport not found")
                     continue
                 aport = pmb.parse.apkbuild(aport_path)
-                if auto_apkindex_package(args, arch, aport, apk, dry):
+                if auto_apkindex_package(arch, aport, apk, dry):
                     ret.append(pkgname)
     return ret

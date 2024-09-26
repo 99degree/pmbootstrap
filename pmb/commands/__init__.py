@@ -15,6 +15,7 @@ from .index import Index
 from .repo_bootstrap import RepoBootstrap
 from .shutdown import Shutdown
 from .test import Test
+from .pkgrel_bump import PkgrelBump
 from .pull import Pull
 from .kconfig_check import KConfigCheck
 from .kconfig_edit import KConfigEdit
@@ -32,7 +33,6 @@ unmigrated_commands = [
     "flasher",
     "initfs",
     "qemu",
-    "pkgrel_bump",
     "aportupgrade",
     "newapkbuild",
     "lint",
@@ -62,25 +62,31 @@ def run_command(args: PmbArgs):
         return
 
     command: Command
-    # Would be nice to use match case but we support Python 3.8
-    if args.action == "log":
-        command = Log(args.clear_log, args.lines)
-    elif args.action == "index":
-        # FIXME: should index support --arch?
-        command = Index()
-    elif args.action == "repo_bootstrap":
-        command = RepoBootstrap(args.arch, args.repository)
-    elif args.action == "shutdown":
-        command = Shutdown()
-    elif args.action == "test":
-        command = Test(args.action_test)
-    elif args.action == "pull":
-        command = Pull()
-    elif args.action == "kconfig" and args.action_kconfig == "check":
-        command = KConfigCheck(args.kconfig_check_details, args.file, args.package, args.keep_going)
-    elif args.action == "kconfig" and args.action_kconfig in ["edit", "migrate"]:
-        command = KConfigEdit(args.package[0], args.action_kconfig == "migrate")
-    else:
-        raise NotImplementedError(f"Command '{args.action}' is not implemented.")
+    match args.action:
+        case "log":
+            command = Log(args.clear_log, args.lines)
+        case "index":
+            # FIXME: should index support --arch?
+            command = Index()
+        case "repo_bootstrap":
+            command = RepoBootstrap(args.arch, args.repository)
+        case "shutdown":
+            command = Shutdown()
+        case "test":
+            command = Test(args.action_test)
+        case "pkgrel_bump":
+            command = PkgrelBump(args.packages, args.dry, args.auto)
+        case "pull":
+            command = Pull()
+        case "kconfig":
+            match args.action_kconfig:
+                case "check":
+                    command = KConfigCheck(
+                        args.kconfig_check_details, args.file, args.package, args.keep_going
+                    )
+                case "edit" | "migrate":
+                    command = KConfigEdit(args.package[0], args.action_kconfig == "migrate")
+        case _:
+            raise NotImplementedError(f"Command '{args.action}' is not implemented.")
 
     command.run()
