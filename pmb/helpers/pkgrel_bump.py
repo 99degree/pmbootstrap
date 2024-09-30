@@ -1,5 +1,7 @@
 # Copyright 2023 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
+from enum import Enum
+
 from pmb.core.arch import Arch
 from pmb.helpers import logging
 
@@ -10,27 +12,35 @@ import pmb.parse
 import pmb.parse.apkindex
 
 
-def package(pkgname: str, reason="", dry: bool = False) -> None:
-    """Increase the pkgrel in the APKBUILD of a specific package.
+class BumpType(Enum):
+    PKGREL = "pkgrel"
+    PKGVER = "pkgver"
+
+
+def package(
+    pkgname: str, reason="", dry: bool = False, bump_type: BumpType = BumpType.PKGREL
+) -> None:
+    """Increase the pkgrel or pkgver in the APKBUILD of a specific package.
 
     :param pkgname: name of the package
     :param reason: string to display as reason why it was increased
     :param dry: don't modify the APKBUILD, just print the message
+    :param bump_type: whether to bump pkgrel or pkgver
     """
-    # Current and new pkgrel
+    # Current and new pkgrel or pkgver
     path = pmb.helpers.pmaports.find(pkgname) / "APKBUILD"
     apkbuild = pmb.parse.apkbuild(path)
-    pkgrel = int(apkbuild["pkgrel"])
-    pkgrel_new = pkgrel + 1
+    version = int(apkbuild[bump_type.value])
+    version_new = version + 1
 
     # Display the message, bail out in dry mode
     logging.info(
         "Increase '"
         + pkgname
-        + "' pkgrel ("
-        + str(pkgrel)
+        + f"' {bump_type.value} ("
+        + str(version)
         + " -> "
-        + str(pkgrel_new)
+        + str(version_new)
         + ")"
         + reason
     )
@@ -38,16 +48,21 @@ def package(pkgname: str, reason="", dry: bool = False) -> None:
         return
 
     # Increase
-    old = "\npkgrel=" + str(pkgrel) + "\n"
-    new = "\npkgrel=" + str(pkgrel_new) + "\n"
+    old = f"\n{bump_type.value}=" + str(version) + "\n"
+    new = f"\n{bump_type.value}=" + str(version_new) + "\n"
     pmb.helpers.file.replace(path, old, new)
+
+    if bump_type == BumpType.PKGVER:
+        pkgrel = int(apkbuild["pkgrel"])
+        # Set pkgrel to 0 if we bump pkgver
+        pmb.helpers.file.replace(path, f"pkgrel={pkgrel}", "pkgrel=0")
 
     # Verify
     pmb.parse.apkbuild.cache_clear()
     apkbuild = pmb.parse.apkbuild(path)
-    if int(apkbuild["pkgrel"]) != pkgrel_new:
+    if int(apkbuild[bump_type.value]) != version_new:
         raise RuntimeError(
-            f"Failed to bump pkgrel for package '{pkgname}'."
+            f"Failed to bump {bump_type.value} for package '{pkgname}'."
             " Make sure that there's a line with exactly the"
             f" string '{old.strip()}' and nothing else in: {path}"
         )

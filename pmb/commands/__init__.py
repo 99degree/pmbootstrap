@@ -16,6 +16,7 @@ from .repo_bootstrap import RepoBootstrap
 from .shutdown import Shutdown
 from .test import Test
 from .pkgrel_bump import PkgrelBump
+from .pkgver_bump import PkgverBump
 from .pull import Pull
 from .kconfig_check import KConfigCheck
 from .kconfig_edit import KConfigEdit
@@ -76,6 +77,8 @@ def run_command(args: PmbArgs):
             command = Test(args.action_test)
         case "pkgrel_bump":
             command = PkgrelBump(args.packages, args.dry, args.auto)
+        case "pkgver_bump":
+            command = PkgverBump(args.packages)
         case "pull":
             command = Pull()
         case "kconfig":

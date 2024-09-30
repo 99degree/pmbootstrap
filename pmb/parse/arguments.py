@@ -577,6 +577,16 @@ def arguments_pkgrel_bump(subparser):
     return ret
 
 
+def arguments_pkgver_bump(subparser):
+    ret = subparser.add_parser(
+        "pkgver_bump",
+        help="increase the pkgver and reset pkgrel to 0." " useful when dealing with metapackages.",
+    )
+
+    add_packages_arg(ret, nargs="*", default=[])
+    return ret
+
+
 def arguments_aportupgrade(subparser):
     ret = subparser.add_parser(
         "aportupgrade", help="check for outdated" " packages that need upgrading"
@@ -958,6 +968,7 @@ def get_parser():
     arguments_initfs(sub)
     arguments_qemu(sub)
     arguments_pkgrel_bump(sub)
+    arguments_pkgver_bump(sub)
     arguments_aportupgrade(sub)
     arguments_newapkbuild(sub)
     arguments_lint(sub)
