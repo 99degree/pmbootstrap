@@ -77,7 +77,7 @@ def type_ondev_cp(val):
 
 def arguments_install(subparser):
     ret = subparser.add_parser(
-        "install", help="set up device specific" " chroot and install to SD card or image file"
+        "install", help="set up device specific chroot and install to SD card or image file"
     )
 
     # Other arguments (that don't fit categories below)
@@ -122,13 +122,13 @@ def arguments_install(subparser):
     group = group_desc.add_mutually_exclusive_group()
     group.add_argument(
         "--no-split",
-        help="create combined boot and root image" " file",
+        help="create combined boot and root image file",
         dest="split",
         action="store_false",
         default=None,
     )
     group.add_argument(
-        "--split", help="create separate boot and root image" " files", action="store_true"
+        "--split", help="create separate boot and root image files", action="store_true"
     )
     group.add_argument(
         "--disk",
@@ -155,11 +155,11 @@ def arguments_install(subparser):
     group.add_argument("--rsync", help="update the disk using rsync", action="store_true")
 
     # Image type "--android-recovery-zip" related
-    group = ret.add_argument_group("optional image type 'android-recovery-zip'" " arguments")
+    group = ret.add_argument_group("optional image type 'android-recovery-zip' arguments")
     group.add_argument(
         "--recovery-install-partition",
         default="system",
-        help="partition to flash from recovery (e.g." " 'external_sd')",
+        help="partition to flash from recovery (e.g. 'external_sd')",
         dest="recovery_install_partition",
     )
     group.add_argument(
@@ -177,7 +177,7 @@ def arguments_install(subparser):
     group.add_argument("--no-fde", help=argparse.SUPPRESS, action="store_true", dest="no_fde")
     group.add_argument(
         "--cipher",
-        help="cryptsetup cipher used to encrypt the" " the rootfs (e.g. 'aes-xts-plain64')",
+        help="cryptsetup cipher used to encrypt the the rootfs (e.g. 'aes-xts-plain64')",
         default=pmb.config.defaults["cipher"],
     )
     group.add_argument(
@@ -195,7 +195,7 @@ def arguments_install(subparser):
     )
     group.add_argument(
         "--add",
-        help="comma separated list of packages to be" " added to the rootfs (e.g. 'vim,gcc')",
+        help="comma separated list of packages to be added to the rootfs (e.g. 'vim,gcc')",
         metavar="PACKAGES",
     )
     group.add_argument(
@@ -207,7 +207,7 @@ def arguments_install(subparser):
     group.add_argument(
         "--no-recommends",
         dest="install_recommends",
-        help="do not install packages listed in _pmb_recommends" " of the UI pmaports",
+        help="do not install packages listed in _pmb_recommends of the UI pmaports",
         action="store_false",
     )
 
@@ -236,7 +236,7 @@ def arguments_install(subparser):
     group.add_argument(
         "--no-local-pkgs",
         dest="install_local_pkgs",
-        help="do not install locally compiled packages and" " package signing keys",
+        help="do not install locally compiled packages and package signing keys",
         action="store_false",
     )
     group.add_argument(
@@ -276,14 +276,14 @@ def arguments_export(subparser):
 
     ret.add_argument(
         "export_folder",
-        help="export folder, defaults to" " /tmp/postmarketOS-export",
+        help="export folder, defaults to /tmp/postmarketOS-export",
         default=Path("/tmp/postmarketOS-export"),
         nargs="?",
         type=lambda x: Path(x),
     )
     ret.add_argument(
         "--odin",
-        help="odin flashable tar" " (boot.img/kernel+initramfs only)",
+        help="odin flashable tar (boot.img/kernel+initramfs only)",
         action="store_true",
         dest="odin_flashable_tar",
     )
@@ -299,26 +299,26 @@ def arguments_export(subparser):
 
 def arguments_sideload(subparser):
     ret = subparser.add_parser(
-        "sideload", help="Push packages to a running" " phone connected over usb or wifi"
+        "sideload", help="Push packages to a running phone connected over usb or wifi"
     )
     add_packages_arg(ret, nargs="+")
     ret.add_argument(
         "--host",
-        help="ip of the device over wifi" " (defaults to 172.16.42.1)",
+        help="ip of the device over wifi (defaults to 172.16.42.1)",
         default="172.16.42.1",
     )
     ret.add_argument(
-        "--port", help="SSH port of the device over wifi" " (defaults to 22)", default="22"
+        "--port", help="SSH port of the device over wifi (defaults to 22)", default="22"
     )
-    ret.add_argument("--user", help="use a different username than the" " one set in init")
+    ret.add_argument("--user", help="use a different username than the one set in init")
     ret.add_argument(
         "--arch",
-        help="skip automatic architecture deduction and use the" " given value",
+        help="skip automatic architecture deduction and use the given value",
         type=lambda x: Arch.from_str(x),
     )
     ret.add_argument(
         "--install-key",
-        help="install the apk key from this" " machine if needed",
+        help="install the apk key from this machine if needed",
         action="store_true",
         dest="install_key",
     )
@@ -326,7 +326,7 @@ def arguments_sideload(subparser):
 
 
 def arguments_flasher(subparser):
-    ret = subparser.add_parser("flasher", help="flash something to the" " target device")
+    ret = subparser.add_parser("flasher", help="flash something to the target device")
     ret.add_argument("--method", help="override flash method", dest="flash_method", default=None)
     sub = ret.add_subparsers(dest="action_flasher")
     sub.required = True
@@ -353,12 +353,12 @@ def arguments_flasher(subparser):
     # Flash lk2nd
     flash_lk2nd = sub.add_parser(
         "flash_lk2nd",
-        help="flash lk2nd, a secondary bootloader" " needed for various Android devices",
+        help="flash lk2nd, a secondary bootloader needed for various Android devices",
     )
     flash_lk2nd.add_argument(
         "--partition",
         default=None,
-        help="partition to flash lk2nd to (defaults to" " default boot image partition ",
+        help="partition to flash lk2nd to (defaults to default boot image partition ",
     )
 
     # Flash rootfs
@@ -388,7 +388,7 @@ def arguments_flasher(subparser):
     flash_vbmeta.add_argument(
         "--partition",
         default=None,
-        help="partition to flash the vbmeta to (defaults" " to deviceinfo_flash_*_partition_vbmeta",
+        help="partition to flash the vbmeta to (defaults to deviceinfo_flash_*_partition_vbmeta",
     )
 
     # Flash dtbo
@@ -396,7 +396,7 @@ def arguments_flasher(subparser):
     flash_dtbo.add_argument(
         "--partition",
         default=None,
-        help="partition to flash the dtbo to (defaults" " to deviceinfo_flash_*_partition_dtbo)",
+        help="partition to flash the dtbo to (defaults to deviceinfo_flash_*_partition_dtbo)",
     )
 
     # Actions without extra arguments
@@ -481,7 +481,7 @@ def arguments_qemu(subparser):
         dest="qemu_kvm",
         default=True,
         action="store_false",
-        help="Avoid using hardware-assisted" " virtualization with KVM even when available (SLOW!)",
+        help="Avoid using hardware-assisted virtualization with KVM even when available (SLOW!)",
     )
     ret.add_argument(
         "--cpu",
@@ -527,7 +527,7 @@ def arguments_qemu(subparser):
         "--video",
         dest="qemu_video",
         default="1024x768@60",
-        help="Video resolution for QEMU" " (WidthxHeight@RefreshRate). Default is 1024x768@60.",
+        help="Video resolution for QEMU (WidthxHeight@RefreshRate). Default is 1024x768@60.",
     )
 
     ret.add_argument(
@@ -580,7 +580,7 @@ def arguments_pkgrel_bump(subparser):
 def arguments_pkgver_bump(subparser):
     ret = subparser.add_parser(
         "pkgver_bump",
-        help="increase the pkgver and reset pkgrel to 0." " useful when dealing with metapackages.",
+        help="increase the pkgver and reset pkgrel to 0. useful when dealing with metapackages.",
     )
 
     add_packages_arg(ret, nargs="*", default=[])
@@ -589,22 +589,22 @@ def arguments_pkgver_bump(subparser):
 
 def arguments_aportupgrade(subparser):
     ret = subparser.add_parser(
-        "aportupgrade", help="check for outdated" " packages that need upgrading"
+        "aportupgrade", help="check for outdated packages that need upgrading"
     )
     ret.add_argument(
         "--dry",
         action="store_true",
-        help="instead of modifying" " APKBUILDs, print the changes that would be made",
+        help="instead of modifying APKBUILDs, print the changes that would be made",
     )
     ret.add_argument("--ref", help="git ref (tag, commit, etc) to use")
 
     # Mutually exclusive: "--all" or package names
     mode = ret.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--all", action="store_true", help="iterate through all" " packages")
+    mode.add_argument("--all", action="store_true", help="iterate through all packages")
     mode.add_argument(
-        "--all-stable", action="store_true", help="iterate" " through all non-git packages"
+        "--all-stable", action="store_true", help="iterate through all non-git packages"
     )
-    mode.add_argument("--all-git", action="store_true", help="iterate through" " all git packages")
+    mode.add_argument("--all-git", action="store_true", help="iterate through all git packages")
     mode.add_argument("packages", nargs="*", default=[])
     return ret
 
@@ -618,9 +618,9 @@ def arguments_newapkbuild(subparser):
     them through in "pmb/helpers/frontend.py". The order of the parameters is
     kept the same as in "newapkbuild -h".
     """
-    sub = subparser.add_parser("newapkbuild", help="get a template to package" " new software")
+    sub = subparser.add_parser("newapkbuild", help="get a template to package new software")
     sub.add_argument(
-        "--folder", help="set postmarketOS aports folder" " (default: main)", default="main"
+        "--folder", help="set postmarketOS aports folder (default: main)", default="main"
     )
 
     # Passthrough: Strings (e.g. -d "my description")
@@ -666,10 +666,10 @@ def arguments_kconfig(subparser):
         "-f",
         "--force",
         action="store_true",
-        help="check all" " kernels, even the ones that would be ignored by" " default",
+        help="check all kernels, even the ones that would be ignored by default",
     )
     check.add_argument("--arch", choices=arch_choices, dest="arch", type=lambda x: Arch.from_str(x))
-    check.add_argument("--file", help="check a file directly instead of a" " config in a package")
+    check.add_argument("--file", help="check a file directly instead of a config in a package")
     check.add_argument(
         "--no-details",
         action="store_false",
@@ -692,13 +692,13 @@ def arguments_kconfig(subparser):
         "-x",
         dest="xconfig",
         action="store_true",
-        help="use xconfig rather than menuconfig for kernel" " configuration",
+        help="use xconfig rather than menuconfig for kernel configuration",
     )
     edit.add_argument(
         "-n",
         dest="nconfig",
         action="store_true",
-        help="use nconfig rather than menuconfig for kernel" " configuration",
+        help="use nconfig rather than menuconfig for kernel configuration",
     )
     add_kernel_arg(edit, nargs=1)
 
@@ -728,7 +728,7 @@ def arguments_repo_bootstrap(subparser):
 def arguments_repo_missing(subparser):
     ret = subparser.add_parser("repo_missing")
     package = ret.add_argument(
-        "package", nargs="?", help="only look at a" " specific package and its dependencies"
+        "package", nargs="?", help="only look at a specific package and its dependencies"
     )
     if "argcomplete" in sys.modules:
         package.completer = package_completer
@@ -745,9 +745,7 @@ def arguments_repo_missing(subparser):
 
 
 def arguments_lint(subparser):
-    lint = subparser.add_parser(
-        "lint", help="run quality checks on pmaports" " (required to pass CI)"
-    )
+    lint = subparser.add_parser("lint", help="run quality checks on pmaports (required to pass CI)")
     add_packages_arg(lint, nargs="*")
 
 
@@ -776,7 +774,7 @@ def arguments_netboot(subparser):
 def arguments_ci(subparser):
     ret = subparser.add_parser(
         "ci",
-        help="run continuous integration scripts" " locally of git repo in current" " directory",
+        help="run continuous integration scripts locally of git repo in current directory",
     )
     script_args = ret.add_mutually_exclusive_group()
     script_args.add_argument("-a", "--all", action="store_true", help="run all scripts")
@@ -785,7 +783,7 @@ def arguments_ci(subparser):
         "scripts",
         nargs="*",
         metavar="script",
-        help="name of the CI script to run, depending on the git" " repository",
+        help="name of the CI script to run, depending on the git repository",
     )
     return ret
 
@@ -820,7 +818,7 @@ def add_packages_arg(subparser, name="packages", *args, **kwargs):
 
 def add_kernel_arg(subparser, name="package", nargs="?", *args, **kwargs):
     arg = subparser.add_argument(
-        name, nargs=nargs, help="kernel package" " (e.g. linux-postmarketos-allwinner)"
+        name, nargs=nargs, help="kernel package (e.g. linux-postmarketos-allwinner)"
     )
     if "argcomplete" in sys.modules:
         arg.completer = kernel_completer
@@ -887,7 +885,7 @@ def get_parser():
     parser.add_argument(
         "-w",
         "--work",
-        help="folder where all data" " gets stored (chroots, caches, built packages)",
+        help="folder where all data gets stored (chroots, caches, built packages)",
     )
     parser.add_argument(
         "-y",
@@ -909,7 +907,7 @@ def get_parser():
     parser.add_argument(
         "-o",
         "--offline",
-        help="Do not attempt to update" " the package index files",
+        help="Do not attempt to update the package index files",
         action="store_true",
     )
 
@@ -921,7 +919,7 @@ def get_parser():
         "--no-cross",
         action="store_false",
         dest="cross",
-        help="disable cross compiler, build only with QEMU and" " gcc (slow!)",
+        help="disable cross compiler, build only with QEMU and gcc (slow!)",
     )
 
     # Logging
@@ -929,7 +927,7 @@ def get_parser():
     parser.add_argument(
         "--details-to-stdout",
         dest="details_to_stdout",
-        help="print details (e.g. build output) to stdout," " instead of writing to the log",
+        help="print details (e.g. build output) to stdout, instead of writing to the log",
         action="store_true",
     )
     parser.add_argument(
@@ -937,7 +935,7 @@ def get_parser():
         "--verbose",
         dest="verbose",
         action="store_true",
-        help="write even more to the" " logfiles (this may reduce performance)",
+        help="write even more to the logfiles (this may reduce performance)",
     )
     parser.add_argument(
         "-q", "--quiet", dest="quiet", action="store_true", help="do not output any log messages"
@@ -986,11 +984,11 @@ def get_parser():
     zap.add_argument(
         "--dry",
         action="store_true",
-        help="instead of actually" " deleting anything, print out what would have been" " deleted",
+        help="instead of actually deleting anything, print out what would have been deleted",
     )
-    zap.add_argument("-hc", "--http", action="store_true", help="also delete" " http cache")
+    zap.add_argument("-hc", "--http", action="store_true", help="also delete http cache")
     zap.add_argument(
-        "-d", "--distfiles", action="store_true", help="also" " delete downloaded source tarballs"
+        "-d", "--distfiles", action="store_true", help="also delete downloaded source tarballs"
     )
     zap.add_argument(
         "-p",
@@ -1004,7 +1002,7 @@ def get_parser():
         "--pkgs-local-mismatch",
         action="store_true",
         dest="pkgs_local_mismatch",
-        help="also delete locally compiled packages without" " existing aport of same version",
+        help="also delete locally compiled packages without existing aport of same version",
     )
     zap.add_argument(
         "-n", "--netboot", action="store_true", help="also delete stored images for netboot"
@@ -1043,7 +1041,7 @@ def get_parser():
     )
 
     # Action: update
-    update = sub.add_parser("update", help="update all existing APKINDEX" " files")
+    update = sub.add_parser("update", help="update all existing APKINDEX files")
     update.add_argument(
         "--arch",
         default=None,
@@ -1054,19 +1052,19 @@ def get_parser():
     update.add_argument(
         "--non-existing",
         action="store_true",
-        help="do not" " only update the existing APKINDEX files, but all of" " them",
+        help="do not only update the existing APKINDEX files, but all of them",
         dest="non_existing",
     )
 
     # Action: build_init / chroot
     build_init = sub.add_parser(
         "build_init",
-        help="initialize build" " environment (usually you do not need to call" " this)",
+        help="initialize build environment (usually you do not need to call this)",
     )
     chroot = sub.add_parser("chroot", help="start shell in chroot")
     chroot.add_argument(
         "--add",
-        help="build/install comma separated list of" " packages in the chroot before entering it",
+        help="build/install comma separated list of packages in the chroot before entering it",
     )
     chroot.add_argument("--user", help="run the command as user, not as root", action="store_true")
     chroot.add_argument(
@@ -1080,13 +1078,13 @@ def get_parser():
     )
     chroot.add_argument(
         "--image",
-        help="Mount the rootfs image and treat" " it like a normal chroot.",
+        help="Mount the rootfs image and treat it like a normal chroot.",
         action="store_true",
     )
     chroot.add_argument(
         "command",
         default=["sh", "-i"],
-        help="command" " to execute inside the chroot. default: sh",
+        help="command to execute inside the chroot. default: sh",
         nargs="*",
     )
     chroot.add_argument(
@@ -1117,13 +1115,13 @@ def get_parser():
             nargs="?",
             const="device",
             choices={"device"} | {str(a) for a in arch_choices},
-            help="Chroot for building packages, defaults to" " device architecture",
+            help="Chroot for building packages, defaults to device architecture",
         )
         suffix.add_argument(
             "-s",
             "--suffix",
             default=None,
-            help="Specify any chroot suffix, defaults to" " 'native'",
+            help="Specify any chroot suffix, defaults to 'native'",
         )
 
     # Action: install
@@ -1143,7 +1141,7 @@ def get_parser():
     # Action: aportgen
     aportgen = sub.add_parser(
         "aportgen",
-        help="generate a postmarketOS" " specific package build recipe" " (aport/APKBUILD)",
+        help="generate a postmarketOS specific package build recipe (aport/APKBUILD)",
     )
     aportgen_fork_alpine = aportgen.add_mutually_exclusive_group()
     aportgen_fork_alpine.add_argument(
@@ -1156,14 +1154,14 @@ def get_parser():
     aportgen_fork_alpine.add_argument(
         "-r",
         "--fork-alpine-retain-branch",
-        help="fork the alpine upstream, but don't change " "branch to match the current channel",
+        help="fork the alpine upstream, but don't change branch to match the current channel",
         action="store_true",
         dest="fork_alpine_retain_branch",
     )
     add_packages_arg(aportgen, nargs="+")
 
     # Action: build
-    build = sub.add_parser("build", help="create a package for a" " specific architecture")
+    build = sub.add_parser("build", help="create a package for a specific architecture")
     build.add_argument(
         "--arch",
         choices=arch_choices,
@@ -1173,7 +1171,7 @@ def get_parser():
         " APKBUILD)",
         type=lambda x: Arch.from_str(x),
     )
-    build.add_argument("--force", action="store_true", help="even build if not" " necessary")
+    build.add_argument("--force", action="store_true", help="even build if not necessary")
     build.add_argument(
         "--strict",
         action="store_true",
@@ -1263,7 +1261,7 @@ def get_parser():
         "-r",
         "--reset",
         action="store_true",
-        help="Reset config options with the given name to it's" " default.",
+        help="Reset config options with the given name to it's default.",
     )
     config.add_argument(
         "name",
@@ -1276,16 +1274,16 @@ def get_parser():
 
     # Action: bootimg_analyze
     bootimg_analyze = sub.add_parser(
-        "bootimg_analyze", help="Extract all the" " information from an existing boot.img"
+        "bootimg_analyze", help="Extract all the information from an existing boot.img"
     )
     bootimg_analyze.add_argument("path", help="path to the boot.img", type=lambda x: Path(x))
     bootimg_analyze.add_argument(
-        "--force", "-f", action="store_true", help="force even if the file seems to be" " invalid"
+        "--force", "-f", action="store_true", help="force even if the file seems to be invalid"
     )
 
     # Action: pull
     sub.add_parser(
-        "pull", help="update all git repositories that pmbootstrap" " cloned (pmaports, etc.)"
+        "pull", help="update all git repositories that pmbootstrap cloned (pmaports, etc.)"
     )
 
     if "argcomplete" in sys.modules:
