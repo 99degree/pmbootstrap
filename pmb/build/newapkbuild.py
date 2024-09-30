@@ -23,7 +23,7 @@ def newapkbuild(folder, args_passed, force=False):
 
     # Run newapkbuild
     pmb.chroot.user(["newapkbuild"] + args_passed, working_dir=build)
-    glob_result = list(build_outside.glob("/*/APKBUILD"))
+    glob_result = list(build_outside.glob("*/APKBUILD"))
     if not len(glob_result):
         return
 
@@ -33,22 +33,22 @@ def newapkbuild(folder, args_passed, force=False):
     target = pkgrepo_default_path() / folder / pkgname
 
     # Move /home/pmos/build/$pkgname/* to /home/pmos/build/*
-    for path in build_outside.glob("/*/*"):
+    for path in build_outside.glob("*/*"):
         path_inside = build / pkgname / os.path.basename(path)
         pmb.chroot.user(["mv", path_inside, build])
     pmb.chroot.user(["rmdir", build / pkgname])
 
     # Overwrite confirmation
     if os.path.exists(target):
-        logging.warning("WARNING: Folder already exists: " + target)
+        logging.warning(f"WARNING: Folder already exists: {target}")
         question = "Continue and delete its contents?"
         if not force and not pmb.helpers.cli.confirm(question):
             raise RuntimeError("Aborted.")
         pmb.helpers.run.user(["rm", "-r", target])
 
     # Copy the aport (without the extracted src folder)
-    logging.info("Create " + target)
+    logging.info(f"Create {target}")
     pmb.helpers.run.user(["mkdir", "-p", target])
-    for path in build_outside.glob("/*"):
+    for path in build_outside.glob("*"):
         if not path.is_dir():
             pmb.helpers.run.user(["cp", path, target])
