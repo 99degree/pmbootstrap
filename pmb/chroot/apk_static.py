@@ -28,7 +28,7 @@ def read_signature_info(tar):
     :returns: (sigfilename, sigkey_path)
     """
     # Get signature filename and key
-    prefix = "sbin/apk.static.SIGN.RSA."
+    prefix = "sbin/apk.static.SIGN.RSA.sha256."
     sigfilename = None
     for filename in tar.getnames():
         if filename.startswith(prefix):
@@ -88,7 +88,7 @@ def verify_signature(files, sigkey_path):
             [
                 "openssl",
                 "dgst",
-                "-sha1",
+                "-sha256",
                 "-verify",
                 sigkey_path,
                 "-signature",
