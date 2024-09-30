@@ -117,6 +117,11 @@ def init(chroot: Chroot, usr_merge=UsrMerge.AUTO):
     # When already initialized: just prepare the chroot
     arch = chroot.arch
 
+    # We plan to ship systemd with split /usr until the /usr merge is complete
+    # in Alpine. Let's not drop all our code yet but just forcefully disable
+    # it.
+    usr_merge = UsrMerge.OFF
+
     config = get_context().config
 
     # If the channel is wrong and the user has auto_zap_misconfigured_chroots
