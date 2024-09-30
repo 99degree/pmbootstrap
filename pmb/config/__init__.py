@@ -238,6 +238,9 @@ apkbuild_package_attributes = {
     # additional configuration options in "pmbootstrap init" that allow
     # selecting alternative providers for a virtual APK package.
     "_pmb_select": {"array": True},
+    # postmarketos-base and UI meta-packages can define the default package
+    # to select during "_pmb_select".
+    "_pmb_default": {"array": True},
 }
 
 # Variables in APKBUILD files that get parsed

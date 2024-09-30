@@ -281,7 +281,7 @@ def ask_for_provider_select(apkbuild, providers_cfg) -> None:
                           providers. Updated with new providers after selection
     """
     for select in apkbuild["_pmb_select"]:
-        providers = pmb.helpers.pmaports.find_providers(select)
+        providers = pmb.helpers.pmaports.find_providers(select, apkbuild["_pmb_default"])
         logging.info(f"Available providers for {select} ({len(providers)}):")
 
         has_default = False

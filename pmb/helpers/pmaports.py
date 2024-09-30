@@ -248,12 +248,13 @@ def get(pkgname, must_exist=True, subpackages=True, skip_extra_repos=False) -> d
     return get_with_path(pkgname, must_exist, subpackages, skip_extra_repos)[1]
 
 
-def find_providers(provide):
+def find_providers(provide: str, default: list[str]) -> list[tuple[Any, Any]]:
     """Search for providers of the specified (virtual) package in pmaports.
 
     Note: Currently only providers from a single APKBUILD are returned.
 
     :param provide: the (virtual) package to search providers for
+    :param default: the _pmb_default to look through for defaults
     :returns: tuple list (pkgname, apkbuild_pkg) with providers, sorted by
               provider_priority. The provider with the highest priority
               (which would be selected by default) comes first.
@@ -266,6 +267,8 @@ def find_providers(provide):
         for provides in subpkg["provides"]:
             # Strip provides version (=$pkgver-r$pkgrel)
             if provides.split("=", 1)[0] == provide:
+                if subpkgname in default:
+                    subpkg["provider_priority"] = 999999
                 providers[subpkgname] = subpkg
 
     return sorted(providers.items(), reverse=True, key=lambda p: p[1].get("provider_priority", 0))
