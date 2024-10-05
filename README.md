@@ -50,6 +50,22 @@ Issues are being tracked
 * ps
 * tar
 
+## Relation to pmaports
+For pmbootstrap to be useful, it needs to maintain a local copy of the
+[pmaports](https://gitlab.com/postmarketOS/pmaports) repository where
+postmarketOS-specific packages are maintained. This is set up automatically, but
+the local copy of pmaports does not automatically get updated. To update it, you
+can run `$ pmbootstrap pull`.
+
+The latest pmbootstrap version works with currently
+[active postmarketOS releases](https://wiki.postmarketos.org/wiki/Releases).
+Attempting to use pmboostrap with old postmarketOS versions (old pmaports
+branches) may result in failures and is not supported. See
+`pmbootstrap_min_version` in
+[pmaports.cfg](https://wiki.postmarketos.org/wiki/Pmaports.cfg_reference) for
+the oldest supported pmbootstrap version for a given pmaports revision. The
+upper bound is not documented.
+
 ## Usage Examples
 Please refer to the [postmarketOS wiki](https://wiki.postmarketos.org) for
 in-depth coverage of topics such as
