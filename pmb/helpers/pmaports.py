@@ -174,11 +174,6 @@ def _find_package_in_apkbuild(package: str, path: Path) -> bool:
         # Provides (cut off before equals sign for entries like
         # "mkbootimg=0.0.1")
         for provides_i in apkbuild_pkg["provides"]:
-            # Ignore provides without version, they shall never be
-            # automatically selected
-            if "=" not in provides_i:
-                continue
-
             if package == provides_i.split("=", 1)[0]:
                 return True
 
@@ -219,20 +214,21 @@ def find(package, must_exist=True, subpackages=True, skip_extra_repos=False):
             # Parse the APKBUILD and verify if the guess was right
             if _find_package_in_apkbuild(package, guess / "APKBUILD"):
                 ret = guess
-            else:
-                # Otherwise parse all APKBUILDs (takes time!), is the
-                # package we are looking for a subpackage of any of those?
-                for path_current in _find_apkbuilds().values():
-                    if _find_package_in_apkbuild(package, path_current):
-                        ret = path_current.parent
-                        break
 
-            # If we still didn't find anything, as last resort: assume our
-            # initial guess was right and the APKBUILD parser just didn't
-            # find the subpackage in there because it is behind shell logic
-            # that we don't parse.
-            if not ret:
-                ret = guess
+        if not guess or (guess and not ret):
+            # Otherwise parse all APKBUILDs (takes time!), is the
+            # package we are looking for a subpackage of any of those?
+            for path_current in _find_apkbuilds().values():
+                if _find_package_in_apkbuild(package, path_current):
+                    ret = path_current.parent
+                    break
+
+        # If we still didn't find anything, as last resort: assume our
+        # initial guess was right and the APKBUILD parser just didn't
+        # find the subpackage in there because it is behind shell logic
+        # that we don't parse.
+        if not ret:
+            ret = guess
 
     # Crash when necessary
     if ret is None and must_exist:
