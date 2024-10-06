@@ -41,21 +41,12 @@ class Chroot:
         """
         Ensures that this suffix follows the correct format.
         """
-        valid_arches = [
-            "x86",
-            "x86_64",
-            "aarch64",
-            "armhf",  # XXX: remove this?
-            "armv7",
-            "riscv64",
-        ]
-
         if self.__type not in ChrootType._member_map_.values():
             raise ValueError(f"Invalid chroot type: '{self.__type}'")
 
         # A buildroot suffix must have a name matching one of alpines
         # architectures.
-        if self.__type == ChrootType.BUILDROOT and self.__name not in valid_arches:
+        if self.__type == ChrootType.BUILDROOT and Arch.from_str(self.__name) not in Arch.supported():
             raise ValueError(f"Invalid buildroot suffix: '{self.__name}'")
 
         # A rootfs or installer suffix must have a name matching a device.
