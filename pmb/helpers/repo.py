@@ -224,7 +224,8 @@ def update(arch: Arch | None = None, force: bool = False, existing_only: bool = 
         target_folder = os.path.dirname(target)
         if not os.path.exists(target_folder):
             pmb.helpers.run.root(["mkdir", "-p", target_folder])
-        pmb.helpers.run.root(["cp", temp, target])
+        if temp:
+            pmb.helpers.run.root(["cp", temp, target])
     pmb.helpers.cli.progress_flush()
 
     return True
