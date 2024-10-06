@@ -76,6 +76,37 @@ def guess_main_dev(subpkgname: str) -> Path | None:
     return None
 
 
+def guess_main_cross(subpkgname: str) -> Path | None:
+    """Check if a subpackage that is part of the cross toolchain is in pmaports or not, and log the appropriate message.
+
+    Don't call this function directly, use guess_main() instead.
+
+    :param subpkgname: subpackage name
+    :returns: full path to the pmaport or None
+    """
+    # If it contains -dev-, assume the parent package is the same, without the infix
+    if "-dev-" in subpkgname:
+        pkgname = subpkgname.replace("-dev-", "-")
+    else:
+        pkgname = subpkgname.replace("g++", "gcc")
+
+    path = _find_apkbuilds().get(pkgname)
+    if path:
+        logging.verbose(
+            subpkgname + ": guessed to be a subpackage of " + pkgname
+        )
+        return path.parent
+
+    logging.verbose(
+        subpkgname
+        + ": guessed to be a subpackage of "
+        + pkgname
+        + ", which we can't find in pmaports, so it's probably in"
+        " Alpine"
+    )
+    return None
+
+
 def guess_main(subpkgname: str) -> Path | None:
     """Find the main package by assuming it is a prefix of the subpkgname.
 
@@ -97,6 +128,12 @@ def guess_main(subpkgname: str) -> Path | None:
     # pick plasma instead of plasma-framework.
     if subpkgname.endswith("-dev"):
         return guess_main_dev(subpkgname)
+
+    # cross/* packages have a bunch of subpackages that do not have the main
+    # package name as a prefix (i.e. g++-*). Further, the -dev check fails here
+    # since the name ends with the name of the architecture.
+    if any(subpkgname.endswith("-" + str(arch)) for arch in Arch.supported()):
+        return guess_main_cross(subpkgname)
 
     # Iterate until the cut up subpkgname is gone
     words = subpkgname.split("-")
