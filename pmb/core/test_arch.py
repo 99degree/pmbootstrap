@@ -28,6 +28,7 @@ def test_valid_arches():
     assert Arch.armhf in Arch.supported()
     assert Arch.armv7 in Arch.supported()
     assert Arch.riscv64 in Arch.supported()
+    assert Arch.ppc64le in Arch.supported()
 
     # kernel arch
     assert Arch.x86.kernel() == "x86"
