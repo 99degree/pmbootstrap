@@ -370,21 +370,7 @@ def setup_keymap(config: Config):
 
 
 def setup_timezone(chroot: Chroot, timezone: str):
-    # We don't care about the arch since it's built for all!
-    alpine_conf = pmb.helpers.package.get("alpine-conf", Arch.native())
-    version = alpine_conf["version"].split("-r")[0]
-
-    setup_tz_cmd = ["setup-timezone"]
-    # setup-timezone will, by default, copy the timezone to /etc/zoneinfo
-    # and disregard tzdata, to save space. If we actually have tzdata
-    # installed, make sure that setup-timezone makes use of it, since
-    # there's no space to be saved.
-    if "tzdata" in pmb.chroot.apk.installed(chroot):
-        setup_tz_cmd += ["-i"]
-    if not pmb.parse.version.check_string(version, ">=3.14.0"):
-        setup_tz_cmd += ["-z"]
-    setup_tz_cmd += [timezone]
-    pmb.chroot.root(setup_tz_cmd, chroot)
+    pmb.chroot.root(["setup-timezone", "-i", timezone], chroot)
 
 
 def setup_hostname(device: str, hostname: str | None):
