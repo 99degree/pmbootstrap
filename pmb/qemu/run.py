@@ -205,7 +205,7 @@ def command_qemu(
                 ]
             )
         ]
-        command += [chroot_native / "usr/bin" / f"qemu-system-{arch}"]
+        command += [chroot_native / "usr/bin" / f"qemu-system-{arch.qemu()}"]
         command += ["-L", chroot_native / "usr/share/qemu/"]
 
     command += ["-nodefaults"]
