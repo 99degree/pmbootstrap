@@ -249,6 +249,9 @@ def command_qemu(
     elif arch == Arch.riscv64:
         command += ["-M", "virt"]
         command += ["-device", "virtio-gpu-pci"]
+    elif arch == Arch.ppc64le:
+        command += ["-M", "pseries"]
+        command += ["-device", "virtio-gpu-pci"]
     else:
         raise RuntimeError(f"Architecture {arch} not supported by this command" " yet.")
 
