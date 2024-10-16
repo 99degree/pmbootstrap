@@ -94,13 +94,10 @@ def detach_all() -> None:
     """
     Detach all loop devices used by pmbootstrap
     """
-    losetup_output = pmb.chroot.root(["losetup", "--json", "--list"], output_return=True)
-    if not losetup_output:
-        return
-    losetup = json.loads(losetup_output)
-    work = get_context().config.work
-    for loopdevice in losetup["loopdevices"]:
-        if Path(loopdevice["back-file"]).is_relative_to(work):
-            pmb.chroot.root(["kpartx", "-d", loopdevice["name"]], check=False)
-            pmb.chroot.root(["losetup", "-d", loopdevice["name"]])
+    chroot = Chroot.native()
+    if pmb.helpers.mount.ismount(chroot / "/dev/loop-control"):
+        pattern = chroot / "/home/pmos/rootfs/*.img"
+        for path_outside in glob.glob(pattern):
+            path = path_outside[len(chroot):]
+            pmb.install.losetup.umount(args, path, auto_init=False)
     return
