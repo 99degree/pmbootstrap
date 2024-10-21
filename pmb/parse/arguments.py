@@ -688,13 +688,14 @@ def arguments_kconfig(subparser):
     # "pmbootstrap kconfig edit"
     edit = sub.add_parser("edit", help="edit kernel aport config")
     edit.add_argument("--arch", choices=arch_choices, dest="arch", type=lambda x: Arch.from_str(x))
-    edit.add_argument(
+    edit_ui_chooser = edit.add_mutually_exclusive_group()
+    edit_ui_chooser.add_argument(
         "-x",
         dest="xconfig",
         action="store_true",
         help="use xconfig rather than menuconfig for kernel configuration",
     )
-    edit.add_argument(
+    edit_ui_chooser.add_argument(
         "-n",
         dest="nconfig",
         action="store_true",

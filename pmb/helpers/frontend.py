@@ -191,7 +191,7 @@ def chroot(args: PmbArgs) -> None:
     # Xauthority
     env = {}
     if args.xauth:
-        pmb.chroot.other.copy_xauthority(args)
+        pmb.chroot.other.copy_xauthority(chroot)
         env["DISPLAY"] = os.environ.get("DISPLAY")
         env["XAUTHORITY"] = "/home/pmos/.Xauthority"
 
