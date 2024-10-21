@@ -95,3 +95,19 @@ deploy:
     - rsync -hrvz --delete -e "ssh -p ${SSH_PORT}" public/ "${SSH_HOST}":/var/www/docs.postmarketos.org/pmbootstrap/
   environment:
     name: deploy
+
+integration:
+  stage: test
+  before_script:
+    - *global_before_scripts
+    - apk upgrade -U
+    - apk add doas git losetup python3 openssl
+    - echo "permit nopass build" > /etc/doas.d/ci-user.conf
+  script:
+    - ".ci/integration.sh"
+  after_script:
+    - "cp /home/build/.local/var/pmbootstrap/log.txt ."
+  artifacts:
+    when: on_failure
+    paths:
+      - "log.txt"
