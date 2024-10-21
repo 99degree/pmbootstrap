@@ -17,7 +17,7 @@ def variables(args: PmbArgs, flavor: str, method: str):
 
     # TODO Remove _partition_system deviceinfo support once pmaports has been
     # updated and minimum pmbootstrap version bumped.
-    # See also https://gitlab.com/postmarketOS/pmbootstrap/-/issues/2243
+    # See also https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues/2243
 
     _partition_kernel: str | None
     _partition_rootfs: str | None

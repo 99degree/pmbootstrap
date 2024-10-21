@@ -41,7 +41,7 @@ This is a reST style.
 #### The `args` variable
 This contains the arguments passed to pmbootstrap, and some additional data.
 See `pmb/helpers/args.py` for details. This is a legacy construct, see
-[#1879](https://gitlab.com/postmarketOS/pmbootstrap/-/issues/1879).
+[#1879](https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues/1879).
 
 #### Executing commands
 Use one of the following functions instead of Python's built-in `subprocess`:

@@ -34,7 +34,7 @@ $ pytest -vv ./test/test_keys.py
 ## Issues
 
 Issues are being tracked
-[here](https://gitlab.com/postmarketOS/pmbootstrap/-/issues).
+[here](https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues).
 
 ## Requirements
 * Linux distribution on the host system (`x86`, `x86_64`, `aarch64` or `armv7`)
@@ -42,7 +42,7 @@ Issues are being tracked
     does **not** work! Please use [VirtualBox](https://www.virtualbox.org/) instead.
   * [Linux kernel 3.17 or higher](https://postmarketos.org/oldkernel)
   * Note: kernel versions between 5.8.8 and 6.0 might 
-    [have issues with parted](https://gitlab.com/postmarketOS/pmbootstrap/-/issues/2309).
+    [have issues with parted](https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues/2309).
 * Python 3.10+
 * For python3 < 3.11: tomli
 * OpenSSL
@@ -52,7 +52,7 @@ Issues are being tracked
 
 ## Relation to pmaports
 For pmbootstrap to be useful, it needs to maintain a local copy of the
-[pmaports](https://gitlab.com/postmarketOS/pmaports) repository where
+[pmaports](https://gitlab.postmarketos.org/postmarketOS/pmaports) repository where
 postmarketOS-specific packages are maintained. This is set up automatically, but
 the local copy of pmaports does not automatically get updated. To update it, you
 can run `$ pmbootstrap pull`.
@@ -117,7 +117,7 @@ $ pmbootstrap checksum hello-world
 
 Generate a template for a new package:
 ```
-$ pmbootstrap newapkbuild "https://gitlab.com/postmarketOS/tinydm/-/archive/1.2.0/tinydm-1.2.0.tar.gz"
+$ pmbootstrap newapkbuild "https://gitlab.postmarketos.org/postmarketOS/tinydm/-/archive/1.2.0/tinydm-1.2.0.tar.gz"
 ```
 
 #### Default architecture

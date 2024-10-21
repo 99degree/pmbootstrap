@@ -300,7 +300,7 @@ UCLAMP_TASK = true  # Scheduler hints
 UCLAMP_TASK_GROUP = true  # Scheduler hints
 UHID = true  # e.g. Bluetooth input devices
 USB_STORAGE = true  # USB mass storage devices
-RT_GROUP_SCHED = false  # https://gitlab.com/postmarketOS/pmaports/-/issues/2652
+RT_GROUP_SCHED = false  # https://gitlab.postmarketos.org/postmarketOS/pmaports/-/issues/2652
 
 # uefi: proper modern booting
 ["category:uefi".">=0.0.0"."all"]
