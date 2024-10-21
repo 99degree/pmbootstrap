@@ -44,6 +44,14 @@ pmb.helpers.devices module
    :undoc-members:
    :show-inheritance:
 
+pmb.helpers.exceptions module
+-----------------------------
+
+.. automodule:: pmb.helpers.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pmb.helpers.file module
 -----------------------
 
@@ -168,6 +176,14 @@ pmb.helpers.status module
 -------------------------
 
 .. automodule:: pmb.helpers.status
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pmb.helpers.toml module
+-----------------------
+
+.. automodule:: pmb.helpers.toml
    :members:
    :undoc-members:
    :show-inheritance:

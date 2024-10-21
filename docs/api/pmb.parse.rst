@@ -12,14 +12,6 @@ pmb.parse.apkindex module
    :undoc-members:
    :show-inheritance:
 
-pmb.parse.arch module
----------------------
-
-.. automodule:: pmb.parse.arch
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pmb.parse.arguments module
 --------------------------
 
@@ -76,10 +68,26 @@ pmb.parse.kconfig module
    :undoc-members:
    :show-inheritance:
 
+pmb.parse.kconfigcheck module
+-----------------------------
+
+.. automodule:: pmb.parse.kconfigcheck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pmb.parse.version module
 ------------------------
 
 .. automodule:: pmb.parse.version
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pmb.parse._apkbuild module
+--------------------------
+
+.. automodule:: pmb.parse._apkbuild
    :members:
    :undoc-members:
    :show-inheritance:

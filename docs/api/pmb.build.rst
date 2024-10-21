@@ -12,6 +12,14 @@ pmb.build.autodetect module
    :undoc-members:
    :show-inheritance:
 
+pmb.build.backend module
+------------------------
+
+.. automodule:: pmb.build.backend
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pmb.build.checksum module
 -------------------------
 
@@ -56,6 +64,14 @@ pmb.build.other module
 ----------------------
 
 .. automodule:: pmb.build.other
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pmb.build._package module
+-------------------------
+
+.. automodule:: pmb.build._package
    :members:
    :undoc-members:
    :show-inheritance:

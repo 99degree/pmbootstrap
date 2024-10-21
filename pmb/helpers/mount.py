@@ -104,6 +104,7 @@ def umount_all(folder: Path):
 def mount_device_rootfs(chroot_rootfs: Chroot, chroot_base: Chroot = Chroot.native()) -> PurePath:
     """
     Mount the device rootfs.
+
     :param chroot_rootfs: the chroot where the rootfs that will be
                           installed on the device has been created (e.g.
                           "rootfs_qemu-amd64")

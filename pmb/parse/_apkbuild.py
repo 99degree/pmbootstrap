@@ -144,11 +144,10 @@ def parse_next_attribute(lines, i, path):
     pkgrel=3
     options="!check" # ignore this comment
     arch='all !armhf'
-    depends="
-        first-pkg
-        second-pkg"
+    depends="first-pkg
+    second-pkg"
 
-    :param lines: \n-terminated list of lines from the APKBUILD
+    :param lines: newline-terminated list of lines from the APKBUILD
     :param i: index of the line we are currently looking at
     :param path: full path to the APKBUILD (for error message)
     :returns: (attribute, value, i)
@@ -380,8 +379,7 @@ def kernels(device: str):
     :returns: None when the kernel is hardcoded in depends
     :returns: kernel types and their description (as read from the subpackages)
               possible types: "downstream", "stable", "mainline"
-              example: {"mainline": "Mainline description",
-                        "downstream": "Downstream description"}
+              example: {"mainline": "Mainline description", "downstream": "Downstream description"}
     """
     # Read the APKBUILD
     apkbuild_path = pmb.helpers.devices.find_path(device, "APKBUILD")

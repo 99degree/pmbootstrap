@@ -8,17 +8,23 @@ from pmb.core.arch import Arch
 @dataclass
 class ApkindexBlock:
     """
-    "depends" is not set for packages without any dependencies, e.g. ``musl``.
-
     "timestamp" and "origin" are not set for virtual packages (#1273).
     We use that information to skip these virtual packages in parse().
     """
 
+    #: the architecture of the package
     arch: Arch
+    #: dependencies for the package
     depends: list[str]
+    #: the origin name of the package
     origin: str | None
+    #: package name
     pkgname: str
+    #: what this package provides
     provides: list[str]
+    #: provider priority for the package
     provider_priority: int | None
+    #: unix timestamp of the package build date/time
     timestamp: str | None
+    #: package version
     version: str

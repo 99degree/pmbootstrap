@@ -4,6 +4,14 @@ pmb.config package
 Submodules
 ----------
 
+pmb.config.file module
+----------------------
+
+.. automodule:: pmb.config.file
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pmb.config.init module
 ----------------------
 
@@ -12,18 +20,10 @@ pmb.config.init module
    :undoc-members:
    :show-inheritance:
 
-pmb.config.load module
-----------------------
+pmb.config.other module
+-----------------------
 
-.. automodule:: pmb.config.load
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pmb.config.merge\_with\_args module
------------------------------------
-
-.. automodule:: pmb.config.merge_with_args
+.. automodule:: pmb.config.other
    :members:
    :undoc-members:
    :show-inheritance:
@@ -32,14 +32,6 @@ pmb.config.pmaports module
 --------------------------
 
 .. automodule:: pmb.config.pmaports
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pmb.config.save module
-----------------------
-
-.. automodule:: pmb.config.save
    :members:
    :undoc-members:
    :show-inheritance:

@@ -68,10 +68,10 @@ pmb.chroot.other module
    :undoc-members:
    :show-inheritance:
 
-pmb.chroot.root module
-----------------------
+pmb.chroot.run module
+---------------------
 
-.. automodule:: pmb.chroot.root
+.. automodule:: pmb.chroot.run
    :members:
    :undoc-members:
    :show-inheritance:
@@ -80,14 +80,6 @@ pmb.chroot.shutdown module
 --------------------------
 
 .. automodule:: pmb.chroot.shutdown
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pmb.chroot.user module
-----------------------
-
-.. automodule:: pmb.chroot.user
    :members:
    :undoc-members:
    :show-inheritance:

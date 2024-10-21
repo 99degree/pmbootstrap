@@ -52,6 +52,14 @@ pmb.install.ui module
    :undoc-members:
    :show-inheritance:
 
+pmb.install._install module
+---------------------------
+
+.. automodule:: pmb.install._install
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -20,6 +20,22 @@ if [ -z "$(command -v sphinx-build)" ]; then
 	exit 1
 fi
 
+# Sanity check docs that all modules are documented.
+# Ignore all packages and files named test*
+fail=0
+modules="$(find pmb/ -name "*.py" | grep -v '/__init__.py' | grep -v '/test' | grep -v '/conftest.py' | sort | sed 's|\.py$||' | sed 's|/|.|g')"
+for module in $modules; do
+    if ! grep -q "automodule:: $module" docs/api/*.rst; then
+        echo "Undocumented module: $module"
+        fail=1
+    fi
+done
+if [ "$fail" -eq 1 ]; then
+    echo "ERROR: Found undocumented modules!"
+    echo "ERROR: Please add this module to the correct .rst file in docs/api/"
+    exit 1
+fi
+
 sphinx-build \
 	docs \
 	public \

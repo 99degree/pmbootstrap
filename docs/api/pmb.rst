@@ -11,7 +11,9 @@ Subpackages
    pmb.build
    pmb.chroot
    pmb.ci
+   pmb.commands
    pmb.config
+   pmb.core
    pmb.export
    pmb.flasher
    pmb.helpers
@@ -20,6 +22,7 @@ Subpackages
    pmb.parse
    pmb.qemu
    pmb.sideload
+   pmb.types
 
 Module contents
 ---------------

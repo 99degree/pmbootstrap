@@ -24,11 +24,10 @@ def get_cross_package_arches(pkgname: str) -> str:
     :param pkgname: package name, e.g. "gcc-aarch64", "gcc-x86_64"
 
     :returns: string of architecture(s) (space separated). It doesn't
-    necessarily make sense to use Arch here given that this value gets
-    used to write APKBUILD files, where the ``arch`` field can have values
-    that aren't necessarily valid arches like "!armhf", "noarch", or
-    "x86 x86_64".
-
+              necessarily make sense to use Arch here given that this value gets
+              used to write APKBUILD files, where the ``arch`` field can have values
+              that aren't necessarily valid arches like "!armhf", "noarch", or
+              "x86 x86_64".
     """
     if pkgname.endswith("-x86_64"):
         return "aarch64"
@@ -46,7 +45,6 @@ def properties(pkgname):
     :param pkgname: package name
 
     :returns: (prefix, folder, options)
-
     """
     for folder, options in pmb.config.aportgen.items():
         for prefix in options["prefixes"]:
