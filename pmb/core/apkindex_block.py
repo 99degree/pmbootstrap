@@ -15,7 +15,7 @@ class ApkindexBlock:
     """
 
     arch: Arch
-    depends: list[str] | None
+    depends: list[str]
     origin: str | None
     pkgname: str
     provides: list[str]

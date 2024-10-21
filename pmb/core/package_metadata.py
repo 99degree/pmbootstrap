@@ -21,7 +21,7 @@ class PackageMetadata:
     def from_apkindex_block(apkindex_block: ApkindexBlock) -> "PackageMetadata":
         return PackageMetadata(
             arch=[str(apkindex_block.arch)],
-            depends=apkindex_block.depends or [],
+            depends=apkindex_block.depends,
             pkgname=apkindex_block.pkgname,
             provides=apkindex_block.provides,
             version=apkindex_block.version,

@@ -1,7 +1,9 @@
 # Copyright 2023 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
 from enum import Enum
+from typing import Any
 
+from pmb.core.apkindex_block import ApkindexBlock
 from pmb.core.arch import Arch
 from pmb.helpers import logging
 
@@ -68,7 +70,9 @@ def package(
         )
 
 
-def auto_apkindex_package(arch, aport, apk, dry: bool = False) -> bool:
+def auto_apkindex_package(
+    arch: Arch, aport: dict[str, Any], apk: ApkindexBlock, dry: bool = False
+) -> bool:
     """Bump the pkgrel of a specific package if it is outdated in the given APKINDEX.
 
     :param arch: the architecture, e.g. "armhf"
@@ -80,7 +84,7 @@ def auto_apkindex_package(arch, aport, apk, dry: bool = False) -> bool:
     :returns: True when there was an APKBUILD that needed to be changed.
     """
     version_aport = aport["pkgver"] + "-r" + aport["pkgrel"]
-    version_apk = apk["version"]
+    version_apk = apk.version
     pkgname = aport["pkgname"]
 
     # Skip when aport version != binary package version
@@ -99,10 +103,9 @@ def auto_apkindex_package(arch, aport, apk, dry: bool = False) -> bool:
         return False
 
     # Find missing depends
-    depends = apk["depends"]
-    logging.verbose("{}: checking depends: {}".format(pkgname, ", ".join(depends)))
+    logging.verbose("{}: checking depends: {}".format(pkgname, ", ".join(apk.depends)))
     missing = []
-    for depend in depends:
+    for depend in apk.depends:
         if depend.startswith("!"):
             # Ignore conflict-dependencies
             continue

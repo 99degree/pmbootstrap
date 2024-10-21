@@ -439,7 +439,11 @@ def provider_shortest(providers: dict[str, ApkindexBlock], pkgname: str) -> Apki
 
 # This can't be cached because the APKINDEX can change during pmbootstrap build!
 def package(
-    package, arch: Arch | None = None, must_exist=True, indexes=None, user_repository=True
+    package: str,
+    arch: Arch | None = None,
+    must_exist: bool = True,
+    indexes: list[Path] | None = None,
+    user_repository: bool = True,
 ) -> ApkindexBlock | None:
     """
     Get a specific package's data from an apkindex.
