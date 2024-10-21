@@ -29,6 +29,7 @@ class Arch(enum.Enum):
     mips64 = "mips64"
     mipsel = "mipsel"
     mips64el = "mips64el"
+    noarch = "noarch"
     ppc = "ppc"
     ppc64 = "ppc64"
     riscv32 = "riscv32"

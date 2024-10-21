@@ -48,8 +48,10 @@ def test_valid_arches():
     assert Arch.native() == Arch.x86_64 or Arch.x86_64.cpu_emulation_required()
     assert Arch.native() == Arch.aarch64 or Arch.aarch64.cpu_emulation_required()
 
-    # Check that every arch has a target triple
+    # Check that every arch has a target triple (except "noarch")
     for arch in Arch:
+        if arch == Arch.noarch:
+            continue
         assert arch.alpine_triple() is not None
 
     # Arch-as-path magic
