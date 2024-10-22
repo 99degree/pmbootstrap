@@ -94,11 +94,11 @@ def parse_next_block(path: Path, lines: list[str]) -> ApkindexBlock | None:
     return ApkindexBlock(
         arch=Arch.from_str(ret["arch"]),
         depends=ret["depends"],
-        origin=ret["origin"],
+        origin=ret.get("origin"),
         pkgname=ret["pkgname"],
         provides=ret["provides"],
         provider_priority=ret.get("provider_priority"),
-        timestamp=ret["timestamp"],
+        timestamp=ret.get("timestamp"),
         version=ret["version"],
     )
 
