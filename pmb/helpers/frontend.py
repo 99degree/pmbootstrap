@@ -403,10 +403,6 @@ def install(args: PmbArgs) -> None:
     pmb.install.install(args)
 
 
-def flasher(args: PmbArgs) -> None:
-    pmb.flasher.frontend(args)
-
-
 def export(args: PmbArgs) -> None:
     pmb.export.frontend(args)
 

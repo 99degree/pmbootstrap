@@ -7,7 +7,6 @@ from pmb.helpers import logging
 
 import pmb.config
 from pmb.parse.deviceinfo import Deviceinfo
-from pmb.types import PmbArgs
 import pmb.flasher
 import pmb.install
 import pmb.chroot.apk
@@ -146,34 +145,3 @@ def flash_lk2nd(deviceinfo: Deviceinfo, method: str) -> None:
 
     logging.info("(native) flash lk2nd image")
     pmb.flasher.run(deviceinfo, method, "flash_lk2nd")
-
-
-def frontend(args: PmbArgs) -> None:
-    context = get_context()
-    action = args.action_flasher
-    device = context.config.device
-    deviceinfo = pmb.parse.deviceinfo()
-    method = args.flash_method or deviceinfo.flash_method
-
-    if method == "none" and action in ["boot", "flash_kernel", "flash_rootfs", "flash_lk2nd"]:
-        logging.info("This device doesn't support any flash method.")
-        return
-
-    if action in ["boot", "flash_kernel"]:
-        kernel(deviceinfo, method, action == "boot", args.autoinstall)
-    elif action == "flash_rootfs":
-        rootfs(deviceinfo, method)
-    elif action == "flash_vbmeta":
-        logging.info("(native) flash vbmeta.img with verity disabled flag")
-        pmb.flasher.run(deviceinfo, method, "flash_vbmeta")
-    elif action == "flash_dtbo":
-        logging.info("(native) flash dtbo image")
-        pmb.flasher.run(deviceinfo, method, "flash_dtbo")
-    elif action == "flash_lk2nd":
-        flash_lk2nd(deviceinfo, method)
-    elif action == "list_flavors":
-        list_flavors(device)
-    elif action == "list_devices":
-        pmb.flasher.run(deviceinfo, method, "list_devices")
-    elif action == "sideload":
-        sideload(deviceinfo, method)

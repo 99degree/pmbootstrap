@@ -21,7 +21,14 @@ def create_zip(args: PmbArgs, chroot: Chroot, device: str):
     flavor = pmb.helpers.frontend._parse_flavor(device)
     deviceinfo = pmb.parse.deviceinfo()
     method = deviceinfo.flash_method
-    fvars = pmb.flasher.variables(args, flavor, method)
+    fvars = pmb.flasher.variables(
+        flavor,
+        method,
+        getattr(args, "cmdline", None),
+        getattr(args, "no_reboot", None),
+        getattr(args, "partition", None),
+        getattr(args, "resume", None),
+    )
 
     # Install recovery installer package in buildroot
     pmb.chroot.apk.install(["postmarketos-android-recovery-installer"], chroot)

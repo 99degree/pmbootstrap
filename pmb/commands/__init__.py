@@ -11,6 +11,7 @@ from pmb.helpers import frontend
 
 from .base import Command
 from .aportgen import Aportgen
+from .flasher import Flasher
 from .log import Log
 from .index import Index
 from .repo_bootstrap import RepoBootstrap
@@ -31,7 +32,6 @@ unmigrated_commands = [
     "export",
     "sideload",
     "netboot",
-    "flasher",
     "initfs",
     "qemu",
     "aportupgrade",
@@ -65,6 +65,16 @@ def run_command(args: PmbArgs):
     match args.action:
         case "aportgen":
             command = Aportgen(args.packages, args.fork_alpine, args.fork_alpine_retain_branch)
+        case "flasher":
+            command = Flasher(
+                args.action_flasher,
+                args.autoinstall,
+                getattr(args, "cmdline", None),
+                args.flash_method,
+                getattr(args, "no_reboot", None),
+                getattr(args, "partition", None),
+                getattr(args, "resume", None),
+            )
         case "log":
             command = Log(args.clear_log, args.lines)
         case "index":

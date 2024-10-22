@@ -20,6 +20,14 @@ pmb.commands.base module
    :undoc-members:
    :show-inheritance:
 
+pmb.commands.flasher module
+---------------------------
+
+.. automodule:: pmb.commands.flasher
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pmb.commands.index module
 -------------------------
 

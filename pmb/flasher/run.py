@@ -24,7 +24,16 @@ def check_partition_blacklist(deviceinfo: Deviceinfo, key, value):
         )
 
 
-def run(deviceinfo: Deviceinfo, method: str, action: str, flavor=None):
+def run(
+    deviceinfo: Deviceinfo,
+    method: str,
+    action: str,
+    flavor: str | None = None,
+    cmdline: str | None = None,
+    no_reboot: bool | None = None,
+    partition: str | None = None,
+    resume: bool | None = None,
+) -> None:
     pmb.flasher.init(deviceinfo.codename, method)
 
     # Verify action
@@ -42,9 +51,7 @@ def run(deviceinfo: Deviceinfo, method: str, action: str, flavor=None):
         )
 
     # Variable setup
-    # FIXME: handle argparsing and pass in only the args we need.
-    args = pmb.helpers.args.please_i_really_need_args()
-    fvars = pmb.flasher.variables(args, flavor, method)
+    fvars = pmb.flasher.variables(flavor, method, cmdline, no_reboot, partition, resume)
 
     # vbmeta flasher requires vbmeta partition to be explicitly specified
     if action == "flash_vbmeta" and not fvars["$PARTITION_VBMETA"]:
@@ -69,12 +76,12 @@ def run(deviceinfo: Deviceinfo, method: str, action: str, flavor=None):
             "Deviceinfo_reference>"
         )
 
-    if args.no_reboot and ("flash" not in action or method != "heimdall-bootimg"):
+    if no_reboot and ("flash" not in action or method != "heimdall-bootimg"):
         raise RuntimeError(
             "The '--no-reboot' option is only" " supported when flashing with heimall-bootimg."
         )
 
-    if args.resume and ("flash" not in action or method != "heimdall-bootimg"):
+    if resume and ("flash" not in action or method != "heimdall-bootimg"):
         raise RuntimeError(
             "The '--resume' option is only" " supported when flashing with heimall-bootimg."
         )

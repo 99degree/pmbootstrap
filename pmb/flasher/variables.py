@@ -3,15 +3,21 @@
 import pmb.config.pmaports
 from pmb.core.chroot import Chroot
 from pmb.core.context import get_context
-from pmb.types import PmbArgs
 
 
-def variables(args: PmbArgs, flavor: str, method: str):
+def variables(
+    flavor: str | None,
+    method: str,
+    cmdline: str | None,
+    no_reboot: bool | None,
+    partition: str | None,
+    resume: bool | None,
+) -> dict[str, str]:
     device = get_context().config.device
     deviceinfo = pmb.parse.deviceinfo()
     _cmdline = deviceinfo.kernel_cmdline or ""
-    if "cmdline" in args and args.cmdline:
-        _cmdline = args.cmdline
+    if cmdline:
+        _cmdline = cmdline
 
     flash_pagesize = deviceinfo.flash_pagesize
 
@@ -54,22 +60,22 @@ def variables(args: PmbArgs, flavor: str, method: str):
         _partition_vbmeta = deviceinfo.flash_heimdall_partition_vbmeta or None
         _partition_dtbo = deviceinfo.flash_heimdall_partition_dtbo or None
 
-    if "partition" in args and args.partition:
+    if partition:
         # Only one operation is done at same time so it doesn't matter
         # sharing the arg
-        _partition_kernel = args.partition
-        _partition_rootfs = args.partition
-        _partition_vbmeta = args.partition
-        _partition_dtbo = args.partition
+        _partition_kernel = partition
+        _partition_rootfs = partition
+        _partition_vbmeta = partition
+        _partition_dtbo = partition
 
     _dtb = deviceinfo.dtb + ".dtb"
 
     _no_reboot = ""
-    if getattr(args, "no_reboot", False):
+    if no_reboot:
         _no_reboot = "--no-reboot"
 
     _resume = ""
-    if getattr(args, "resume", False):
+    if resume:
         _resume = "--resume"
 
     fvars = {
