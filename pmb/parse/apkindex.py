@@ -91,13 +91,23 @@ def parse_next_block(path: Path, lines: list[str]) -> ApkindexBlock | None:
                 ret[key].append(value)
         else:
             ret[key] = []
+    provider_priority = ret.get("provider_priority")
+    if provider_priority:
+        if not provider_priority.isdigit():
+            raise RuntimeError(
+                f"Invalid provider_priority: '{provider_priority}' parsing block {ret}"
+            )
+        provider_priority = int(provider_priority)
+    else:
+        provider_priority = None
+
     return ApkindexBlock(
         arch=Arch.from_str(ret["arch"]),
         depends=ret["depends"],
         origin=ret.get("origin"),
         pkgname=ret["pkgname"],
         provides=ret["provides"],
-        provider_priority=ret.get("provider_priority"),
+        provider_priority=provider_priority,
         timestamp=ret.get("timestamp"),
         version=ret["version"],
     )
@@ -306,7 +316,7 @@ def parse_blocks(path: Path) -> list[ApkindexBlock]:
 
 
 def cache_key(path: Path) -> str:
-    return str(path.relative_to(get_context().config.work))
+    return str(path.relative_to(get_context().config.work, walk_up=True))
 
 
 def clear_cache(path: Path) -> bool:

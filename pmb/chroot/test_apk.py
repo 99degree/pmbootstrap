@@ -21,7 +21,7 @@ def apk_mocks(monkeypatch) -> dict | None:
 
     def _apkindex_package(
         _package: str, _arch: Arch, _must_exist: bool = False, indexes=None
-    ) -> ApkindexBlock:
+    ) -> ApkindexBlock | None:
         if _package == "package1":
             return ApkindexBlock(
                 arch=_arch,
@@ -67,6 +67,8 @@ def apk_mocks(monkeypatch) -> dict | None:
                 timestamp=None,
                 version="5.5-r0",
             )
+
+        return None
 
     monkeypatch.setattr(pmb.parse.apkindex, "package", _apkindex_package)
     return None
