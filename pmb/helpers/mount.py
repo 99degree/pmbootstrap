@@ -7,7 +7,7 @@ from pmb.core import Chroot
 import pmb.helpers.run
 
 
-def ismount(folder: Path):
+def ismount(folder: Path) -> bool:
     """Ismount() implementation that works for mount --bind.
 
     Workaround for: https://bugs.python.org/issue29707
@@ -23,7 +23,9 @@ def ismount(folder: Path):
     return False
 
 
-def bind(source: Path, destination: Path, create_folders=True, umount=False):
+def bind(
+    source: Path, destination: Path, create_folders: bool = True, umount: bool = False
+) -> None:
     """Mount --bind a folder and create necessary directory structure.
 
     :param umount: when destination is already a mount point, umount it first.
@@ -52,7 +54,7 @@ def bind(source: Path, destination: Path, create_folders=True, umount=False):
         raise RuntimeError(f"Mount failed: {source} -> {destination}")
 
 
-def bind_file(source: Path, destination: Path, create_folders=False):
+def bind_file(source: Path, destination: Path, create_folders: bool = False) -> None:
     """Mount a file with the --bind option, and create the destination file, if necessary."""
     # Skip existing mountpoint
     if ismount(destination):
@@ -93,7 +95,7 @@ def umount_all_list(prefix: Path, source: Path = Path("/proc/mounts")) -> list[P
     return ret
 
 
-def umount_all(folder: Path):
+def umount_all(folder: Path) -> None:
     """Umount all folders that are mounted inside a given folder."""
     for mountpoint in umount_all_list(folder):
         pmb.helpers.run.root(["umount", mountpoint])

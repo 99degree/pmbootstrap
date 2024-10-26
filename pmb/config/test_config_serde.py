@@ -12,7 +12,7 @@ def test_load(config_file):
     assert config.extra_packages == "neofetch,neovim,reboot-mode"
     assert config.hostname == "qemu-amd64"
     assert not config.is_default_channel
-    assert config.jobs == "8"
+    assert config.jobs == 8
     assert config.kernel == "edge"
     assert config.locale == "C.UTF-8"
     assert config.ssh_keys

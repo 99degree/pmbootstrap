@@ -10,6 +10,7 @@ import glob
 import json
 import os
 import shutil
+from pathlib import Path
 from typing import Any
 
 import pmb.aportgen
@@ -39,13 +40,11 @@ def require_programs() -> None:
             missing.append(program)
     if missing:
         raise RuntimeError(
-            "Can't find all programs required to run"
-            " pmbootstrap. Please install first:"
-            f" {', '.join(missing)}"
+            f"Can't find all programs required to run pmbootstrap. Please install first: {', '.join(missing)}"
         )
 
 
-def ask_for_username(default_user: str):
+def ask_for_username(default_user: str) -> str:
     """Ask for a reasonable username for the non-root user.
 
     :returns: the username
@@ -62,7 +61,7 @@ def ask_for_username(default_user: str):
         return ret
 
 
-def ask_for_work_path(args: PmbArgs):
+def ask_for_work_path(args: PmbArgs) -> tuple[Path, bool]:
     """Ask for the work path, until we can create it (when it does not exist) and write into it.
 
     :returns: (path, exists)
@@ -110,11 +109,11 @@ def ask_for_work_path(args: PmbArgs):
             return (work, exists)
         except OSError:
             logging.fatal(
-                "ERROR: Could not create this folder, or write" " inside it! Please try again."
+                "ERROR: Could not create this folder, or write inside it! Please try again."
             )
 
 
-def ask_for_channel(config: Config):
+def ask_for_channel(config: Config) -> str:
     """Ask for the postmarketOS release channel.
     The channel dictates, which pmaports branch pmbootstrap will check out,
     and which repository URLs will be used when initializing chroots.
@@ -147,12 +146,10 @@ def ask_for_channel(config: Config):
         ret = pmb.helpers.cli.ask("Channel", None, default, complete=choices)
         if ret in choices:
             return ret
-        logging.fatal(
-            "ERROR: Invalid channel specified, please type in one" " from the list above."
-        )
+        logging.fatal("ERROR: Invalid channel specified, please type in one from the list above.")
 
 
-def ask_for_ui(deviceinfo):
+def ask_for_ui(deviceinfo: Deviceinfo) -> str:
     ui_list = pmb.helpers.ui.list_ui(deviceinfo.arch)
     hidden_ui_count = 0
     device_is_accelerated = deviceinfo.gpu_accelerated == "true"
@@ -187,7 +184,7 @@ def ask_for_ui(deviceinfo):
         if ret in dict(ui_list).keys():
             return ret
         logging.fatal(
-            "ERROR: Invalid user interface specified, please type in" " one from the list above."
+            "ERROR: Invalid user interface specified, please type in one from the list above."
         )
 
 
@@ -221,7 +218,7 @@ def ask_for_systemd(config: Config, ui):
     default_is_systemd = pmb.helpers.ui.check_option(ui, "pmb:systemd")
     not_str = " " if default_is_systemd else " not "
     logging.info(
-        "Based on your UI selection, 'default' will result" f" in{not_str}installing systemd."
+        f"Based on your UI selection, 'default' will result in{not_str}installing systemd."
     )
 
     choices = SystemdConfig.choices()
@@ -235,7 +232,7 @@ def ask_for_systemd(config: Config, ui):
     return answer
 
 
-def ask_for_keymaps(config: Config, deviceinfo: Deviceinfo):
+def ask_for_keymaps(config: Config, deviceinfo: Deviceinfo) -> str:
     if not deviceinfo.keymaps or deviceinfo.keymaps.strip() == "":
         return ""
     options = deviceinfo.keymaps.split(" ")
@@ -247,10 +244,10 @@ def ask_for_keymaps(config: Config, deviceinfo: Deviceinfo):
         ret = pmb.helpers.cli.ask("Keymap", None, config.keymap, True, complete=options)
         if ret in options:
             return ret
-        logging.fatal("ERROR: Invalid keymap specified, please type in" " one from the list above.")
+        logging.fatal("ERROR: Invalid keymap specified, please type in one from the list above.")
 
 
-def ask_for_timezone():
+def ask_for_timezone() -> str:
     localtimes = ["/etc/zoneinfo/localtime", "/etc/localtime"]
     zoneinfo_path = "/usr/share/zoneinfo/"
     for localtime in localtimes:
@@ -269,7 +266,7 @@ def ask_for_timezone():
             logging.info(f"Your host timezone: {tz}")
             if pmb.helpers.cli.confirm("Use this timezone instead of GMT?", default="y"):
                 return tz
-    logging.info("WARNING: Unable to determine timezone configuration on host," " using GMT.")
+    logging.info("WARNING: Unable to determine timezone configuration on host, using GMT.")
     return "GMT"
 
 
@@ -327,11 +324,11 @@ def ask_for_provider_select(apkbuild, providers_cfg) -> None:
                 providers_cfg[select] = providers_short[ret]
                 break
             logging.fatal(
-                "ERROR: Invalid provider specified, please type in" " one from the list above."
+                "ERROR: Invalid provider specified, please type in one from the list above."
             )
 
 
-def ask_for_provider_select_pkg(pkgname, providers_cfg) -> None:
+def ask_for_provider_select_pkg(pkgname: str, providers_cfg: dict[str, str]) -> None:
     """Look up the APKBUILD for the specified pkgname and ask for selectable
     providers that are specified using "_pmb_select".
 
@@ -346,7 +343,7 @@ def ask_for_provider_select_pkg(pkgname, providers_cfg) -> None:
     ask_for_provider_select(apkbuild, providers_cfg)
 
 
-def ask_for_device_kernel(config: Config, device: str):
+def ask_for_device_kernel(config: Config, device: str) -> str:
     """Ask for the kernel that should be used with the device.
 
     :param device: code name, e.g. "lg-mako"
@@ -369,7 +366,7 @@ def ask_for_device_kernel(config: Config, device: str):
     # Ask for kernel (extra message when downstream and upstream are available)
     logging.info("Which kernel do you want to use with your device?")
     if "downstream" in kernels:
-        logging.info("Downstream kernels are typically the outdated Android" " kernel forks.")
+        logging.info("Downstream kernels are typically the outdated Android kernel forks.")
     if "downstream" in kernels and len(kernels) > 1:
         logging.info(
             "Upstream kernels (mainline, stable, ...) get security"
@@ -385,11 +382,11 @@ def ask_for_device_kernel(config: Config, device: str):
         ret = pmb.helpers.cli.ask("Kernel", None, default, True, complete=kernels)
         if ret in kernels.keys():
             return ret
-        logging.fatal("ERROR: Invalid kernel specified, please type in one" " from the list above.")
+        logging.fatal("ERROR: Invalid kernel specified, please type in one from the list above.")
     return ret
 
 
-def ask_for_device(context: Context):
+def ask_for_device(context: Context) -> tuple[str, bool, str]:
     """
     Prompt for the device vendor, model, and kernel.
 
@@ -400,7 +397,7 @@ def ask_for_device(context: Context):
     """
     vendors = sorted(pmb.helpers.devices.list_vendors())
     logging.info(
-        "Choose your target device vendor (either an " "existing one, or a new one for porting)."
+        "Choose your target device vendor (either an existing one, or a new one for porting)."
     )
     logging.info(f"Available vendors ({len(vendors)}): {', '.join(vendors)}")
 
@@ -445,7 +442,7 @@ def ask_for_device(context: Context):
                     " <https://postmarketos.org/renamed>"
                     " to see if it was renamed"
                 )
-            logging.info("You are about to do" f" a new device port for '{device}'.")
+            logging.info(f"You are about to do a new device port for '{device}'.")
             if not pmb.helpers.cli.confirm(default=True):
                 current_vendor = vendor
                 continue
@@ -466,7 +463,7 @@ def ask_for_device(context: Context):
     return (device, device_path is not None, kernel)
 
 
-def ask_for_additional_options(config) -> None:
+def ask_for_additional_options(config: Config) -> None:
     context = pmb.core.context.get_context()
     # Allow to skip additional options
     logging.info(
@@ -505,7 +502,7 @@ def ask_for_additional_options(config) -> None:
     config.boot_size = int(answer)
 
     # Parallel job count
-    logging.info("How many jobs should run parallel on this machine, when" " compiling?")
+    logging.info("How many jobs should run parallel on this machine, when compiling?")
     answer = pmb.helpers.cli.ask("Jobs", None, config.jobs, validation_regex="^[1-9][0-9]*$")
     config.jobs = int(answer)
 
@@ -532,10 +529,10 @@ def ask_for_additional_options(config) -> None:
         " that you'll have to authorize sudo more than once."
     )
     answer = pmb.helpers.cli.confirm(
-        "Enable background timer to prevent" " repeated sudo authorization?",
+        "Enable background timer to prevent repeated sudo authorization?",
         default=context.sudo_timer,
     )
-    config.sudo_timer = str(answer)
+    config.sudo_timer = answer
 
     # Mirrors
     # prompt for mirror change
@@ -550,7 +547,7 @@ def ask_for_additional_options(config) -> None:
         config.mirrors["systemd"] = os.path.join(mirror, "staging/systemd/")
 
 
-def ask_for_mirror():
+def ask_for_mirror() -> str:
     regex = "^[1-9][0-9]*$"  # single non-zero number only
 
     json_path = pmb.helpers.http.download(
@@ -605,7 +602,7 @@ def ask_for_mirror():
     return mirror
 
 
-def ask_for_hostname(default: str | None, device):
+def ask_for_hostname(default: str | None, device: str) -> str:
     if device:
         device = pmb.helpers.other.normalize_hostname(device)
     while True:
@@ -624,7 +621,7 @@ def ask_for_ssh_keys(default: bool) -> bool:
     if not len(glob.glob(os.path.expanduser("~/.ssh/id_*.pub"))):
         return False
     return pmb.helpers.cli.confirm(
-        "Would you like to copy your SSH public" " keys to the device?", default=default
+        "Would you like to copy your SSH public keys to the device?", default=default
     )
 
 
@@ -635,11 +632,11 @@ def ask_build_pkgs_on_install(default: bool) -> bool:
         " changes, reply 'n' for a faster installation."
     )
     return pmb.helpers.cli.confirm(
-        "Build outdated packages during" " 'pmbootstrap install'?", default=default
+        "Build outdated packages during 'pmbootstrap install'?", default=default
     )
 
 
-def get_locales():
+def get_locales() -> list[str]:
     ret = []
     list_path = f"{pmb.config.pmb_src}/pmb/data/locales"
     with open(list_path) as handle:
@@ -666,7 +663,7 @@ def ask_for_locale(current_locale: str) -> str:
         )
         ret = ret.replace(".UTF-8", "")
         if ret not in locales:
-            logging.info("WARNING: this locale is not in the list of known" " valid locales.")
+            logging.info("WARNING: this locale is not in the list of known valid locales.")
             if pmb.helpers.cli.ask() != "y":
                 # Ask again
                 continue

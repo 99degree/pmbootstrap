@@ -182,7 +182,7 @@ def configure_abuild(chroot: Chroot, verify=False):
         for line in handle:
             if not line.startswith(prefix):
                 continue
-            if line != (prefix + jobs + "\n"):
+            if line != (prefix + str(jobs) + "\n"):
                 if verify:
                     raise RuntimeError(
                         f"Failed to configure abuild: {path}"
