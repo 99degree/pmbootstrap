@@ -82,10 +82,16 @@ def migrate_work_folder():
     # Read current version
     context = get_context()
     current = 0
+    suffix: str | None = None
     path = context.config.work / "version"
     if os.path.exists(path):
         with open(path) as f:
-            current = int(f.read().rstrip())
+            # pmb 2.3.x added a suffix due to conflicting work versions
+            # We need to be able to handle that going forward
+            version_parts = f.read().rstrip().split("-")
+            current = int(version_parts[0])
+            if len(version_parts) == 2:
+                suffix = version_parts[1]
 
     # Compare version, print warning or do nothing
     required = pmb.config.work_version
@@ -96,7 +102,8 @@ def migrate_work_folder():
         " (from version " + str(current) + " to " + str(required) + ")!"
     )
 
-    if current == 6:
+    # version 6 and version 7 from 2.3.x branch are equivalent for this and we need to migrate
+    if current == 6 or (current == 7 and suffix == "2.x"):
         # Ask for confirmation
         logging.info("Changelog:")
         logging.info("* Major refactor for pmb 3.0.0")
