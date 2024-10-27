@@ -101,7 +101,7 @@ integration:
   before_script:
     - *global_before_scripts
     - apk upgrade -U
-    - apk add doas git losetup python3 openssl
+    - apk add doas git losetup multipath-tools python3 openssl
     - echo "permit nopass build" > /etc/doas.d/ci-user.conf
   script:
     - ".ci/integration.sh"

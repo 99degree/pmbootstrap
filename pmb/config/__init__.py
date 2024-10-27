@@ -59,6 +59,8 @@ ondev_min_version = "0.2.0"
 # idea is to run almost everything in Alpine chroots.
 required_programs = [
     "git",
+    "kpartx",
+    "losetup",
     "openssl",
     "ps",
     "tar",

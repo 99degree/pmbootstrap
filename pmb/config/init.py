@@ -6,6 +6,7 @@ from pmb.core.config import SystemdConfig
 from pmb.core.context import Context
 from pmb.core.pkgrepo import pkgrepo_default_path
 from pmb.helpers import logging
+from pmb.helpers.exceptions import NonBugError
 import glob
 import json
 import os
@@ -38,10 +39,31 @@ def require_programs() -> None:
     for program in pmb.config.required_programs:
         if not shutil.which(program):
             missing.append(program)
+
+    losetup_missing_json = False
+
+    if "losetup" not in missing:
+        # Check if losetup supports the --json argument.
+        try:
+            pmb.helpers.run.user(["losetup", "--json"], check=True)
+        except RuntimeError:
+            losetup_missing_json = True
+
+    error_message = ""
+
     if missing:
-        raise RuntimeError(
-            f"Can't find all programs required to run pmbootstrap. Please install first: {', '.join(missing)}"
-        )
+        error_message += f"Can't find all programs required to run pmbootstrap. Please install the following: {', '.join(missing)}"
+
+    if missing and losetup_missing_json:
+        error_message += "\n\nAdditionally, your"
+    elif losetup_missing_json:
+        error_message += "Your"
+
+    if losetup_missing_json:
+        error_message += " system's losetup implementation is missing --json support. If you are using BusyBox, try installing losetup from util-linux."
+
+    if error_message:
+        raise NonBugError(error_message)
 
 
 def ask_for_username(default_user: str) -> str:

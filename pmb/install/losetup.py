@@ -13,7 +13,7 @@ import pmb.chroot
 from pmb.core import Chroot
 
 
-def init():
+def init() -> None:
     if not Path("/sys/module/loop").is_dir():
         pmb.helpers.run.root(["modprobe", "loop"])
     for loopdevice in Path("/dev/").glob("loop*"):
@@ -22,7 +22,7 @@ def init():
         pmb.helpers.mount.bind_file(loopdevice, Chroot.native() / loopdevice)
 
 
-def mount(img_path: Path, _sector_size: int | None = None):
+def mount(img_path: Path, _sector_size: int | None = None) -> Path:
     """
     :param img_path: Path to the img file inside native chroot.
     """
@@ -56,6 +56,8 @@ def mount(img_path: Path, _sector_size: int | None = None):
                 raise e
             pass
 
+    raise AssertionError("This should never be reached")
+
 
 def device_by_back_file(back_file: Path) -> Path:
     """
@@ -75,7 +77,7 @@ def device_by_back_file(back_file: Path) -> Path:
     raise RuntimeError(f"Failed to find loop device for {back_file}")
 
 
-def umount(img_path: Path):
+def umount(img_path: Path) -> None:
     """
     :param img_path: Path to the img file inside native chroot.
     """
@@ -88,7 +90,7 @@ def umount(img_path: Path):
     pmb.chroot.root(["losetup", "-d", device])
 
 
-def detach_all():
+def detach_all() -> None:
     """
     Detach all loop devices used by pmbootstrap
     """
@@ -98,7 +100,6 @@ def detach_all():
     losetup = json.loads(losetup_output)
     work = get_context().config.work
     for loopdevice in losetup["loopdevices"]:
-        print(loopdevice["back-file"])
         if Path(loopdevice["back-file"]).is_relative_to(work):
             pmb.helpers.run.root(["kpartx", "-d", loopdevice["name"]], check=False)
             pmb.helpers.run.root(["losetup", "-d", loopdevice["name"]])

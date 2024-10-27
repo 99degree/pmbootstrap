@@ -47,6 +47,8 @@ Issues are being tracked
 * For python3 < 3.11: tomli
 * OpenSSL
 * git
+* kpartx (from multipath-tools)
+* losetup (with --json support, e.g. util-linux version)
 * ps
 * tar
 
