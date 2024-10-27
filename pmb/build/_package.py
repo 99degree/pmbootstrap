@@ -323,6 +323,7 @@ def process_package(
     arch: Arch | None,
     fallback_arch: Arch,
     force: bool,
+    from_src: bool,
 ) -> list[str]:
     """
     :param arch: Set if we should build for a specific arch.
@@ -330,7 +331,17 @@ def process_package(
     # Only build when APKBUILD exists
     base_aports, base_apkbuild = get_apkbuild(pkgname)
     if not base_apkbuild:
+        # We allow this function to be called for packages that aren't in pmaports
+        # and just do nothing in this case. However this can be quite confusing
+        # when building an Alpine package with --src since we'll just do nothing
         if pmb.parse.apkindex.providers(pkgname, fallback_arch, False):
+            if from_src:
+                raise NonBugError(
+                    f"Package {pkgname} is not in pmaports, but exists in Alpine."
+                    " to build it with --src you first need to fork it to pmaports."
+                    f" Please run 'pmbootstrap aportgen --fork-alpine {pkgname}' and then"
+                    " try again"
+                )
             return []
         raise RuntimeError(
             f"{pkgname}: Could not find aport, and" " could not find this package in any APKINDEX!"
@@ -548,7 +559,7 @@ def packages(
     all_dependencies: list[str] = []
     for pkgname in pkgnames:
         all_dependencies += process_package(
-            context, queue_build, pkgname, arch, fallback_arch, force
+            context, queue_build, pkgname, arch, fallback_arch, force, src is not None
         )
 
     # If any of our common build packages need to be built and are missing, then add them
