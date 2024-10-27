@@ -5,7 +5,6 @@ from typing import cast, overload, Any, Literal
 from collections.abc import Sequence
 from pmb.core.apkindex_block import ApkindexBlock
 from pmb.core.arch import Arch
-from pmb.core.context import get_context
 from pmb.helpers import logging
 from pathlib import Path
 import tarfile
@@ -315,8 +314,9 @@ def parse_blocks(path: Path) -> list[ApkindexBlock]:
         ret.append(block)
 
 
-def cache_key(path: Path) -> str:
-    return str(path.relative_to(get_context().config.work, walk_up=True))
+# FIXME: come up with something better here...
+def cache_key(path: Path) -> int:
+    return hash(path)
 
 
 def clear_cache(path: Path) -> bool:

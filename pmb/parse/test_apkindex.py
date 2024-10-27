@@ -1,7 +1,10 @@
+from pathlib import Path
 from pmb.core.arch import Arch
 import pytest
 
-from .apkindex import parse as parse_apkindex
+import pmb.parse.apkindex
+
+from .apkindex import parse as parse_apkindex, clear_cache as clear_apkindex_cache
 
 example_apkindex = """
 C:Q1p+nGf5oBAmbU9FQvV4MhfEmWqVE=
@@ -231,13 +234,20 @@ D:blkid btrfs-progs buffyboard busybox-extras bzip2 cryptsetup device-mapper dev
 p:postmarketos-ramdisk=3.3.5-r2"""
 
 
-def test_apkindex_parse(tmp_path) -> None:
+@pytest.fixture
+def valid_apkindex_file(tmp_path) -> Path:
+    # FIXME: use tmpfile fixture from !2453
     tmpfile = tmp_path / "APKINDEX.1"
     print(tmp_path)
     f = open(tmpfile, "w")
     f.write(example_apkindex)
     f.close()
 
+    return tmpfile
+
+
+def test_apkindex_parse(valid_apkindex_file) -> None:
+    tmpfile = valid_apkindex_file
     blocks = parse_apkindex(tmpfile, True)
     for k, v in blocks.items():
         print(f"{k}: {v}")
@@ -409,3 +419,24 @@ i:postmarketos-base-ui=29-r1 xorg-server
 
     # We expect parsing to succeed when the timestamp is missing
     parse_apkindex(tmpfile, True)
+
+
+def test_apkindex_parse_cache_hit(valid_apkindex_file, monkeypatch) -> None:
+    # First parse normally, filling the cache
+    parse_apkindex(valid_apkindex_file)
+
+    # Mock that always asserts when called
+    def mock_parse_next_block(path, lines):
+        assert False
+
+    # parse_next_block() is only called on cache miss
+    monkeypatch.setattr(pmb.parse.apkindex, "parse_next_block", mock_parse_next_block)
+
+    # Now we expect the cache to be hit and thus the mock won't be called, so no assertion error
+    parse_apkindex(valid_apkindex_file)
+
+    # Now we clear the cache, the mock should be called and we'll assert
+    clear_apkindex_cache(valid_apkindex_file)
+
+    with pytest.raises(AssertionError):
+        parse_apkindex(valid_apkindex_file)
