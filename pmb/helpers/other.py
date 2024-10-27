@@ -83,12 +83,14 @@ def migrate_work_folder():
     context = get_context()
     current = 0
     suffix: str | None = None
+    current_with_suffix = ""
     path = context.config.work / "version"
     if os.path.exists(path):
         with open(path) as f:
             # pmb 2.3.x added a suffix due to conflicting work versions
             # We need to be able to handle that going forward
-            version_parts = f.read().rstrip().split("-")
+            current_with_suffix = f.read().rstrip()
+            version_parts = current_with_suffix.split("-")
             current = int(version_parts[0])
             if len(version_parts) == 2:
                 suffix = version_parts[1]
@@ -99,7 +101,7 @@ def migrate_work_folder():
         return
     logging.info(
         "WARNING: Your work folder version needs to be migrated"
-        " (from version " + str(current) + " to " + str(required) + ")!"
+        f" (from version {current_with_suffix} to {required})!"
     )
 
     # version 6 and version 7 from 2.3.x branch are equivalent for this and we need to migrate
@@ -116,8 +118,14 @@ def migrate_work_folder():
         pmb.chroot.zap(False)
 
         # Update version file
-        migrate_success(context.config.work, 7)
-        current = 7
+        if suffix == "2.x":
+            # If we come from 7-2.x, then we already updated the git urls and
+            # can skip the 7->8 migration step
+            migrate_success(context.config.work, 8)
+            current = 8
+        else:
+            migrate_success(context.config.work, 7)
+            current = 7
 
     if current == 7:
         # Ask for confirmation
