@@ -68,7 +68,9 @@ def run_command(args: PmbArgs):
         case "flasher":
             command = Flasher(
                 args.action_flasher,
-                args.autoinstall,
+                # FIXME: defaults copied from pmb/helpers/arguments.py
+                # we should have these defaults defined in one place!
+                getattr(args, "autoinstall", True),
                 getattr(args, "cmdline", None),
                 args.flash_method,
                 getattr(args, "no_reboot", None),
