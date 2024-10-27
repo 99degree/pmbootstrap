@@ -10,6 +10,7 @@ See also:
 
 import os
 import hashlib
+from pmb.helpers.exceptions import NonBugError
 from pmb.core.context import get_context
 from pmb.core.arch import Arch
 from pmb.core.pkgrepo import pkgrepo_names
@@ -209,7 +210,10 @@ def update(arch: Arch | None = None, force=False, existing_only=False):
     # Download and move to right location
     for i, (url, target) in enumerate(outdated.items()):
         pmb.helpers.cli.progress_print(i / len(outdated))
-        temp = pmb.helpers.http.download(url, "APKINDEX", False, logging.DEBUG, True)
+        temp = pmb.helpers.http.download(url, "APKINDEX", False, logging.DEBUG, True, True)
+        if not temp:
+            logging.info("NOTE: check the [mirrors] section in 'pmbootstrap config'")
+            raise NonBugError("getting APKINDEX from binary package mirror failed!")
         target_folder = os.path.dirname(target)
         if not os.path.exists(target_folder):
             pmb.helpers.run.root(["mkdir", "-p", target_folder])

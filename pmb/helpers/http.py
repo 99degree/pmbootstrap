@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import shutil
 import urllib.request
+import pmb.helpers.cli
 
 from pmb.core.context import get_context
 import pmb.helpers.run
@@ -17,7 +18,9 @@ def cache_file(prefix: str, url: str) -> Path:
     return Path(f"{prefix}_{hashlib.sha256(url.encode('utf-8')).hexdigest()}")
 
 
-def download(url, prefix, cache=True, loglevel=logging.INFO, allow_404=False):
+def download(
+    url, prefix, cache=True, loglevel=logging.INFO, allow_404=False, flush_progress_bar_on_404=False
+):
     """Download a file to disk.
 
     :param url: the http(s) address of to the file to download
@@ -30,6 +33,8 @@ def download(url, prefix, cache=True, loglevel=logging.INFO, allow_404=False):
         point in showing a dozen messages.
     :param allow_404: do not raise an exception when the server responds with a 404 Not Found error.
         Only display a warning on stdout (no matter if loglevel is changed).
+    :param flush_progress_bar_on_404: download happens while a progress bar is
+        displayed, flush it before printing a warning for 404
 
     :returns: path to the downloaded file in the cache or None on 404
     """
@@ -58,6 +63,8 @@ def download(url, prefix, cache=True, loglevel=logging.INFO, allow_404=False):
     # Handle 404
     except urllib.error.HTTPError as e:
         if e.code == 404 and allow_404:
+            if flush_progress_bar_on_404:
+                pmb.helpers.cli.progress_flush()
             logging.warning("WARNING: file not found: " + url)
             return None
         raise
