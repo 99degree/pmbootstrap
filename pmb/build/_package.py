@@ -480,18 +480,27 @@ def packages(
         channel = pmb.config.pmaports.read_config(aports)["channel"]
         index_data = pmb.parse.apkindex.package(name, arch, False)
         # Make sure we aren't building a package that will never be used! This can happen if
-        # building with --src with an outdated pmaports checkout.
+        # building with --src with an outdated pmaports checkout. Unless --force is used
+        # in which case we assume it was intentional.
         if (
             index_data
             and pmb.parse.version.compare(index_data.version, f"{pkgver}-r{apkbuild['pkgrel']}")
             == 1
         ):
-            raise NonBugError(
-                f"A binary package for {name} has a newer version ({index_data.version})"
-                f" than the source ({pkgver}-{apkbuild['pkgrel']}). Please ensure your pmaports branch is up"
-                " to date and that you don't have a newer version of the package in your local"
-                f" binary repo ({context.config.work / 'packages' / channel / pkg_arch})."
-            )
+            if force:
+                logging.warning(
+                    f"WARNING: A binary package for {name} has a newer version ({index_data.version})"
+                    f" than the source ({pkgver}-{apkbuild['pkgrel']}). The package to be build will"
+                    f" not be installed automatically, use 'apk add {name}={pkgver}-r{apkbuild['pkgrel']}'"
+                    " to install it."
+                )
+            else:
+                raise NonBugError(
+                    f"A binary package for {name} has a newer version ({index_data.version})"
+                    f" than the source ({pkgver}-{apkbuild['pkgrel']}). Please ensure your pmaports branch is up"
+                    " to date and that you don't have a newer version of the package in your local"
+                    f" binary repo ({context.config.work / 'packages' / channel / pkg_arch})."
+                )
         build_queue.append(
             {
                 "name": name,
