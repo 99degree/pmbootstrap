@@ -209,7 +209,8 @@ def update(arch: Arch | None = None, force=False, existing_only=False):
     # Download and move to right location
     for i, (url, target) in enumerate(outdated.items()):
         pmb.helpers.cli.progress_print(i / len(outdated))
-        temp = pmb.helpers.http.download(url, "APKINDEX", False, logging.DEBUG, True)
+        temp = pmb.helpers.http.download(url, "APKINDEX", False, logging.DEBUG, False)
+        #  Changed last param to False to not have to handle None returned if a 404 is encountered, better error handling wanted
         target_folder = os.path.dirname(target)
         if not os.path.exists(target_folder):
             pmb.helpers.run.root(["mkdir", "-p", target_folder])

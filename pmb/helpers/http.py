@@ -89,7 +89,7 @@ def retrieve(url, headers=None, allow_404=False):
     # Handle 404
     except urllib.error.HTTPError as e:
         if e.code == 404 and allow_404:
-            logging.warning("WARNING: failed to retrieve content from: " + url)
+            logging.warning("WARNING: 404 received, failed to retrieve content from: " + url)
             return None
         raise
 
