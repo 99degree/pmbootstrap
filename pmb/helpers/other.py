@@ -67,10 +67,10 @@ def check_binfmt_misc(args):
         raise RuntimeError(f"Failed to set up binfmt_misc, see: {link}")
 
 
-def migrate_success(args, version):
+def migrate_success(args, version, suffix=""):
     logging.info("Migration to version " + str(version) + " done")
     with open(args.work + "/version", "w") as handle:
-        handle.write(str(version) + "\n")
+        handle.write(str(version) + suffix + "\n")
 
 
 def migrate_work_folder(args):
@@ -79,7 +79,8 @@ def migrate_work_folder(args):
     path = args.work + "/version"
     if os.path.exists(path):
         with open(path, "r") as f:
-            current = int(f.read().rstrip())
+            # In 2.3.x branch we have some special versions, here we can just ignore this suffix.
+            current = int(f.read().rstrip().replace("-2.x", ""))
 
     # Compare version, print warning or do nothing
     required = pmb.config.work_version
@@ -230,6 +231,30 @@ def migrate_work_folder(args):
         # Update version file
         migrate_success(args, 6)
         current = 6
+
+    if current == 6:
+        # Ask for confirmation
+        logging.info("Changelog:")
+        logging.info("* Moved from gitlab.com to gitlab.postmarketOS.org")
+        logging.info("Migration will do the following:")
+        logging.info("* Update your pmaports remote URL")
+        if not pmb.helpers.cli.confirm(args):
+            raise RuntimeError("Aborted.")
+
+        pmb.helpers.git.migrate_upstream_remote(args)
+        try:
+            pmb.helpers.git.get_upstream_remote(args, "pmaports")
+        except RuntimeError:
+            logging.error(
+                "Couldn't find new upstream remote, migration failed."
+                " Please try updating the remote manually with:\n"
+                f" $ git -C '{args.aports}' remote set-url origin 'https://gitlab.postmarketos.org/postmarketOS/pmaports.git'"
+            )
+            raise RuntimeError("Migration failed.")
+
+        # Update version file
+        migrate_success(args, 7, "-2.x")
+        current = 7
 
     # Can't migrate, user must delete it
     if current != required:

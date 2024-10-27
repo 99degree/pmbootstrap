@@ -1,8 +1,10 @@
 # Copyright 2023 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
 import configparser
+from enum import Enum
 import logging
 import os
+from typing import List
 
 import pmb.build
 import pmb.chroot.apk
@@ -54,7 +56,7 @@ def clone(args, name_repo):
         open(fetch_head, "w").close()
 
 
-def rev_parse(args, path, revision="HEAD", extra_args: list = []):
+def rev_parse(args, path, revision="HEAD", extra_args: List = []):
     """Run "git rev-parse" in a specific repository dir.
 
     :param path: to the git repository
@@ -85,6 +87,12 @@ def clean_worktree(args, path):
     return pmb.helpers.run.user(args, command, path, output_return=True) == ""
 
 
+def list_remotes(args, aports) -> List[str]:
+    command = ["git", "remote", "-v"]
+    output = pmb.helpers.run.user(args, command, aports, output_return=True)
+    return output.splitlines()
+
+
 def get_upstream_remote(args, name_repo):
     """Find the remote, which matches the git URL from the config.
 
@@ -92,13 +100,80 @@ def get_upstream_remote(args, name_repo):
     """
     url = pmb.config.git_repos[name_repo]
     path = get_path(args, name_repo)
-    command = ["git", "remote", "-v"]
-    output = pmb.helpers.run.user(args, command, path, output_return=True)
-    for line in output.split("\n"):
+    lines = list_remotes(args, path)
+    for line in lines:
         if url in line:
             return line.split("\t", 1)[0]
+
+    # Fallback to old URLs, in case the migration was not done yet
+    if name_repo == "pmaports":
+        urls_outdated = OUTDATED_GIT_REMOTES_HTTP
+        for line in lines:
+            if any(u in line.lower() for u in urls_outdated):
+                logging.warning("WARNING: pmaports has an outdated remote URL")
+                return line.split("\t", 1)[0]
+
     raise RuntimeError("{}: could not find remote name for URL '{}' in git"
                        " repository: {}".format(name_repo, url, path))
+
+
+class RemoteType(Enum):
+    FETCH = "fetch"
+    PUSH = "push"
+
+    @staticmethod
+    def from_git_output(git_remote_type: str) -> "RemoteType":
+        if git_remote_type == "(fetch)":
+            return RemoteType.FETCH
+        elif git_remote_type == "(push)":
+            return RemoteType.PUSH
+        else:
+            raise ValueError(f'Unknown remote type "{git_remote_type}"')
+
+
+def set_remote_url(args, repo: str, remote_name: str, remote_url: str, remote_type: RemoteType) -> None:
+    command: List[str] = [
+        "git",
+        "-C",
+        repo,
+        "remote",
+        "set-url",
+        remote_name,
+        remote_url,
+        "--push" if remote_type == RemoteType.PUSH else "--no-push",
+    ]
+
+    pmb.helpers.run.user(args, command, output="stdout")
+
+
+# Intentionally lower case for case-insensitive comparison
+OUTDATED_GIT_REMOTES_HTTP: List[str] = ["https://gitlab.com/postmarketos/pmaports.git"]
+
+
+def migrate_upstream_remote(args) -> None:
+    """Migrate pmaports git remote URL from gitlab.com to gitlab.postmarketos.org."""
+
+    lines = list_remotes(args, args.aports)
+
+    current_git_remote_http: str = pmb.config.git_repos["pmaports"]
+
+    for line in lines:
+        if not line:
+            continue  # Skip empty line at the end.
+
+        remote_name, remote_url, remote_type_raw = line.split()
+        remote_type = RemoteType.from_git_output(remote_type_raw)
+
+        if remote_url.lower() in OUTDATED_GIT_REMOTES_HTTP:
+            new_remote = current_git_remote_http
+        else:
+            new_remote = None
+
+        if new_remote:
+            logging.info(
+                f"Migrating to new {remote_type.value} URL (from {remote_url} to {new_remote})"
+            )
+            set_remote_url(args, args.aports, remote_name, current_git_remote_http, remote_type)
 
 
 def parse_channels_cfg(args):

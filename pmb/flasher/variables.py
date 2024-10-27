@@ -12,7 +12,7 @@ def variables(args, flavor, method):
 
     # TODO Remove _partition_system deviceinfo support once pmaports has been
     # updated and minimum pmbootstrap version bumped.
-    # See also https://gitlab.com/postmarketOS/pmbootstrap/-/issues/2243
+    # See also https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues/2243
 
     if method.startswith("fastboot"):
         _partition_kernel = args.deviceinfo["flash_fastboot_partition_kernel"]\

@@ -45,7 +45,7 @@ pmaports_min_version = "7"
 # Version of the work folder (as asked during 'pmbootstrap init'). Increase
 # this number, whenever migration is required and provide the migration code,
 # see migrate_work_folder()).
-work_version = 6
+work_version = 7
 
 # Minimum required version of postmarketos-ondev (pmbootstrap install --ondev).
 # Try to support the current versions of all channels (edge, v21.03). When
@@ -676,7 +676,7 @@ kconfig_options_community = {
             "UCLAMP_TASK_GROUP": True,  # Scheduler hints
             "UHID": True,  # e.g. Bluetooth input devices
             "USB_STORAGE": True,  # USB mass storage devices
-            "RT_GROUP_SCHED": False, # https://gitlab.com/postmarketOS/pmaports/-/issues/2652
+            "RT_GROUP_SCHED": False, # https://gitlab.postmarketos.org/postmarketOS/pmaports/-/issues/2652
         },
     },
 }
@@ -1109,7 +1109,7 @@ flashers = {
 #
 git_repos = {
     "aports_upstream": "https://gitlab.alpinelinux.org/alpine/aports.git",
-    "pmaports": "https://gitlab.com/postmarketOS/pmaports.git",
+    "pmaports": "https://gitlab.postmarketos.org/postmarketOS/pmaports.git",
 }
 
 #

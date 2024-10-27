@@ -21,7 +21,7 @@ $ pytest -vv ./test/test_keys.py
 ## Issues
 
 Issues are being tracked
-[here](https://gitlab.com/postmarketOS/pmbootstrap/-/issues).
+[here](https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues).
 
 ## Requirements
 * Linux distribution on the host system (`x86`, `x86_64`, `aarch64` or `armv7`)
@@ -29,7 +29,7 @@ Issues are being tracked
     does **not** work! Please use [VirtualBox](https://www.virtualbox.org/) instead.
   * [Linux kernel 3.17 or higher](https://postmarketos.org/oldkernel)
   * Note: kernel versions between 5.8.8 and 6.0 might 
-    [have issues with parted](https://gitlab.com/postmarketOS/pmbootstrap/-/issues/2309).
+    [have issues with parted](https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues/2309).
 * Python 3.7+
 * OpenSSL
 * git
@@ -87,7 +87,7 @@ $ pmbootstrap checksum hello-world
 
 Generate a template for a new package:
 ```
-$ pmbootstrap newapkbuild "https://gitlab.com/postmarketOS/tinydm/-/archive/1.2.0/tinydm-1.2.0.tar.gz"
+$ pmbootstrap newapkbuild "https://gitlab.postmarketos.org/postmarketOS/tinydm/-/archive/1.2.0/tinydm-1.2.0.tar.gz"
 ```
 
 #### Default architecture

@@ -84,9 +84,10 @@ def ask_for_work_path(args):
             # created the work directory or the user has deleted it for
             # whatever reason then we need to write initialize it.
             work_version_file = f"{work}/version"
+            suffix = "-2.x"
             if not os.path.isfile(work_version_file):
                 with open(work_version_file, "w") as handle:
-                    handle.write(f"{pmb.config.work_version}\n")
+                    handle.write(f"{pmb.config.work_version}{suffix}\n")
 
             # Create cache_git dir, so it is owned by the host system's user
             # (otherwise pmb.helpers.mount.bind would create it as root)

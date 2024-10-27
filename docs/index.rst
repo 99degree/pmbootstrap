@@ -33,6 +33,6 @@ Indices and tables
 *Note:* This documentation is currently a work-in-progress, your feedback and contributions are very welcome!
 
 .. _postmarketOS-wiki: https://wiki.postmarketos.org/wiki/Main_Page
-.. _issue-tracker: https://gitlab.com/postmarketOS/pmbootstrap/-/issues
-.. _repository: https://gitlab.com/postmarketOS/pmbootstrap/
+.. _issue-tracker: https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/issues
+.. _repository: https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/
 .. _Installation: https://wiki.postmarketos.org/wiki/Installation
