@@ -72,7 +72,7 @@ def device_by_back_file(back_file: Path) -> Path:
     # Find the back_file
     losetup = json.loads(losetup_output)
     for loopdevice in losetup["loopdevices"]:
-        if Path(loopdevice["back-file"]) == back_file:
+        if loopdevice["back-file"] is not None and Path(loopdevice["back-file"]) == back_file:
             return Path(loopdevice["name"])
     raise RuntimeError(f"Failed to find loop device for {back_file}")
 
