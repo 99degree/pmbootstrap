@@ -3,12 +3,10 @@
 import pmb.config
 from pmb.core.context import Context
 from pmb.core.pkgrepo import pkgrepo_default_path
-from pmb.helpers import logging
 from pmb.types import PmbArgs
 import pmb.helpers.git
 import pmb.helpers.args
 
-__args: PmbArgs = PmbArgs()
 
 """This file constructs the args variable, which is passed to almost all
    functions in the pmbootstrap code base. Here's a listing of the kind of
@@ -49,7 +47,7 @@ __args: PmbArgs = PmbArgs()
 
 
 def init(args: PmbArgs) -> PmbArgs:
-    global __args
+    args_ = PmbArgs()
     # Basic initialization
     # print(json.dumps(args.__dict__))
     # sys.exit(0)
@@ -120,14 +118,6 @@ def init(args: PmbArgs) -> PmbArgs:
     # Copy all properties from args to out that don't start with underscores
     for key, value in vars(args).items():
         if not key.startswith("_") and not key == "from_argparse":
-            setattr(__args, key, value)
+            setattr(args_, key, value)
 
-    return __args
-
-
-def please_i_really_need_args() -> PmbArgs:
-    import traceback
-
-    traceback.print_stack(file=logging.logfd)
-    logging.warning("FIXME: retrieved args where it shouldn't be needed!")
-    return __args
+    return args_
