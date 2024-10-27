@@ -14,12 +14,6 @@ if [ "$(id -u)" = 0 ]; then
 	exec su "${TESTUSER:-build}" -c "sh -e $0"
 fi
 
-# Require sphinx to be installed on the host system
-if [ -z "$(command -v sphinx-build)" ]; then
-	echo "ERROR: sphinx-build command not found, make sure it is in your PATH."
-	exit 1
-fi
-
 # Sanity check docs that all modules are documented.
 # Ignore all packages and files named test*
 fail=0
