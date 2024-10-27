@@ -276,6 +276,10 @@ def prioritise_build_queue(disarray: list[BuildQueueItem]) -> list[BuildQueueIte
                     raise NonBugError(f"{item['name']}: dependency not found: {dep}")
                 dep = dep_data.pkgname
 
+                # If the dependency is a subpackage we can safely ignore it
+                if dep in item["apkbuild"]["subpackages"]:
+                    continue
+
                 if dep in all_pkgnames:
                     unmet_deps.setdefault(item["name"], []).append(dep)
                     missing_deps = True

@@ -14,6 +14,9 @@ before_script: &global_before_scripts
   - ".ci/note.sh"
   - apk upgrade -U
   - "adduser -D build"
+  # Force IPv4 for gitlab.postmarketos.org until it supports IPv6 too, OSUOSL is
+  # working on it (infra#195)
+  - "echo '140.211.167.182 gitlab.postmarketos.org' >> /etc/hosts"
 
 stages:
   - lint
