@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import pytest
 import shutil
+import tempfile
 
 import pmb.core
 from pmb.core.context import get_context
@@ -165,3 +166,8 @@ def pmaports(pmb_args, monkeypatch):
         pmb.helpers.git.clone("pmaports")
 
     assert pmb.helpers.run.user(["git", "checkout", "master"], working_dir=config.aports[0]) == 0
+
+
+@pytest.fixture
+def tmp_file(tmp_path):
+    return Path(tempfile.mkstemp(dir=tmp_path)[1])
