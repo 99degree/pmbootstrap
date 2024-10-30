@@ -12,7 +12,7 @@ from pmb.core import Chroot
 from pmb.core.context import get_context
 
 
-def previous_install(path: Path):
+def previous_install(path: Path) -> bool:
     """
     Search the disk for possible existence of a previous installation of
     pmOS. We temporarily mount the possible pmOS_boot partition as
@@ -39,7 +39,7 @@ def previous_install(path: Path):
     return "pmOS_boot" in label
 
 
-def mount_disk(path: Path):
+def mount_disk(path: Path) -> None:
     """
     :param path: path to disk block device (e.g. /dev/mmcblk0)
     """
@@ -61,7 +61,9 @@ def mount_disk(path: Path):
             raise RuntimeError("Aborted.")
 
 
-def create_and_mount_image(args: PmbArgs, size_boot, size_root, size_reserve, split=False):
+def create_and_mount_image(
+    args: PmbArgs, size_boot: int, size_root: int, size_reserve: int, split: bool = False
+) -> None:
     """
     Create a new image file, and mount it as /dev/install.
 
@@ -105,9 +107,9 @@ def create_and_mount_image(args: PmbArgs, size_boot, size_root, size_reserve, sp
     images = {img_path_full: size_mb_full}
     if split:
         images = {img_path_boot: size_mb_boot, img_path_root: size_mb_root}
-    for img_path, size_mb in images.items():
-        logging.info(f"(native) create {img_path.name} " f"({size_mb})")
-        pmb.chroot.root(["truncate", "-s", size_mb, img_path])
+    for img_path, image_size_mb in images.items():
+        logging.info(f"(native) create {img_path.name} " f"({image_size_mb})")
+        pmb.chroot.root(["truncate", "-s", image_size_mb, img_path])
 
     # Mount to /dev/install
     mount_image_paths = {img_path_full: "/dev/install"}
@@ -121,7 +123,9 @@ def create_and_mount_image(args: PmbArgs, size_boot, size_root, size_reserve, sp
         pmb.helpers.mount.bind_file(device, Chroot.native() / mount_point)
 
 
-def create(args: PmbArgs, size_boot, size_root, size_reserve, split, disk: Path | None):
+def create(
+    args: PmbArgs, size_boot: int, size_root: int, size_reserve: int, split: bool, disk: Path | None
+) -> None:
     """
     Create /dev/install (the "install blockdevice").
 

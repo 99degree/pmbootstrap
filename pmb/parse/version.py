@@ -206,7 +206,7 @@ def validate(version):
     return True
 
 
-def compare(a_version: str, b_version: str, fuzzy=False):
+def compare(a_version: str, b_version: str, fuzzy: bool = False) -> int:
     """
     Compare two versions A and B to find out which one is higher, or if
     both are equal.

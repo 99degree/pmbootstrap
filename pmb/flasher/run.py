@@ -6,7 +6,7 @@ import pmb.chroot.initfs
 import pmb.helpers.args
 
 
-def check_partition_blacklist(deviceinfo: Deviceinfo, key, value):
+def check_partition_blacklist(deviceinfo: Deviceinfo, key: str, value: str) -> None:
     if not key.startswith("$PARTITION_"):
         return
 

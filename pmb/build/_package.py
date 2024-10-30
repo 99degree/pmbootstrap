@@ -30,7 +30,7 @@ from pmb.core import Chroot
 from pmb.core.context import get_context
 
 
-def check_build_for_arch(pkgname: str, arch: Arch):
+def check_build_for_arch(pkgname: str, arch: Arch) -> bool:
     """Check if pmaport can be built or exists as binary for a specific arch.
 
     :returns: * True when it can be built
@@ -67,7 +67,7 @@ def check_build_for_arch(pkgname: str, arch: Arch):
     raise RuntimeError(f"Can't build '{pkgname}' for architecture {arch}")
 
 
-def get_depends(context: Context, apkbuild):
+def get_depends(context: Context, apkbuild: dict[str, Any]) -> list[str]:
     """Alpine's abuild always builds/installs the "depends" and "makedepends" of a package
     before building it.
 
@@ -95,7 +95,7 @@ def get_depends(context: Context, apkbuild):
     return ret
 
 
-def get_pkgver(original_pkgver: str, original_source=False):
+def get_pkgver(original_pkgver: str, original_source: bool = False) -> str:
     """Get the original pkgver when using the original source.
 
     Otherwise, get the pkgver with an appended suffix of current date and time.
@@ -106,7 +106,6 @@ def get_pkgver(original_pkgver: str, original_source=False):
     :param original_pkgver: unmodified pkgver from the package's APKBUILD.
     :param original_source: the original source is used instead of overriding
                             it with --src.
-    :param now: use a specific date instead of current date (for test cases)
     """
     if original_source:
         return original_pkgver
@@ -123,7 +122,14 @@ def output_path(arch: Arch, pkgname: str, pkgver: str, pkgrel: str) -> Path:
     return arch / f"{pkgname}-{pkgver}-r{pkgrel}.apk"
 
 
-def finish(apkbuild, channel, arch, output: Path, chroot: Chroot, strict=False):
+def finish(
+    apkbuild: dict[str, Any],
+    channel: str,
+    arch: Arch,
+    output: Path,
+    chroot: Chroot,
+    strict: bool = False,
+) -> None:
     """Various finishing tasks that need to be done after a build."""
     # Verify output file
     out_dir = get_context().config.work / "packages" / channel
@@ -213,7 +219,9 @@ class BuildQueueItem(TypedDict):
     chroot: Chroot
 
 
-def has_cyclical_dependency(unmet_deps: dict[str, list[str]], item: BuildQueueItem, dep: str):
+def has_cyclical_dependency(
+    unmet_deps: dict[str, list[str]], item: BuildQueueItem, dep: str
+) -> bool:
     pkgnames = [item["name"]] + list(item["apkbuild"]["subpackages"].keys())
 
     for pkgname in pkgnames:
@@ -246,7 +254,7 @@ def prioritise_build_queue(disarray: list[BuildQueueItem]) -> list[BuildQueueIte
         all_pkgnames.append(item["name"])
         all_pkgnames += item["apkbuild"]["subpackages"].keys()
 
-    def queue_item(item: BuildQueueItem):
+    def queue_item(item: BuildQueueItem) -> None:
         queue.append(item)
         disarray.remove(item)
         all_pkgnames.remove(item["name"])
@@ -444,10 +452,10 @@ def packages(
     context: Context,
     pkgnames: list[str],
     arch: Arch | None = None,
-    force=False,
-    strict=False,
-    src=None,
-    bootstrap_stage=BootstrapStage.NONE,
+    force: bool = False,
+    strict: bool = False,
+    src: str | None = None,
+    bootstrap_stage: int = BootstrapStage.NONE,
     log_callback: Callable | None = None,
 ) -> list[str]:
     """

@@ -15,7 +15,7 @@ from typing import Any
 from pmb.helpers.exceptions import NonBugError
 
 
-def folder_size(path: Path):
+def folder_size(path: Path) -> int:
     """Run `du` to calculate the size of a folder.
 
     (this is less code and faster than doing the same task in pure Python)
@@ -32,7 +32,7 @@ def folder_size(path: Path):
     return ret
 
 
-def check_grsec():
+def check_grsec() -> None:
     """Check if the current kernel is based on the grsec patchset.
 
     Also check if the chroot_deny_chmod option is enabled.
@@ -47,7 +47,7 @@ def check_grsec():
     )
 
 
-def check_binfmt_misc():
+def check_binfmt_misc() -> None:
     """Check if the 'binfmt_misc' module is loaded.
 
     This is done by checking, if /proc/sys/fs/binfmt_misc/ exists.
@@ -72,13 +72,13 @@ def check_binfmt_misc():
         raise RuntimeError(f"Failed to set up binfmt_misc, see: {link}")
 
 
-def migrate_success(work: Path, version):
+def migrate_success(work: Path, version: int) -> None:
     logging.info("Migration to version " + str(version) + " done")
     with open(work / "version", "w") as handle:
         handle.write(str(version) + "\n")
 
 
-def migrate_work_folder():
+def migrate_work_folder() -> None:
     # Read current version
     context = get_context()
     current = 0
@@ -182,7 +182,7 @@ def normalize_hostname(hostname: str) -> str:
     return hostname
 
 
-def validate_hostname(hostname):
+def validate_hostname(hostname: str) -> bool:
     """Check whether the string is a valid hostname.
 
     Check is performed according to

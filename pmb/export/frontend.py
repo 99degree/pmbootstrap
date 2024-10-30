@@ -10,7 +10,7 @@ import pmb.export
 from pmb.core import Chroot, ChrootType
 
 
-def frontend(args: PmbArgs):  # FIXME: ARGS_REFACTOR
+def frontend(args: PmbArgs) -> None:  # FIXME: ARGS_REFACTOR
     config = get_context().config
     # Create the export folder
     target = args.export_folder

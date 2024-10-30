@@ -65,7 +65,7 @@ def clone(name_repo: str) -> None:
         open(fetch_head, "w").close()
 
 
-def rev_parse(path: Path, revision="HEAD", extra_args: list = []) -> str:
+def rev_parse(path: Path, revision: str = "HEAD", extra_args: list = []) -> str:
     """Run "git rev-parse" in a specific repository dir.
 
     :param path: to the git repository
@@ -79,7 +79,7 @@ def rev_parse(path: Path, revision="HEAD", extra_args: list = []) -> str:
     return rev.rstrip()
 
 
-def can_fast_forward(path, branch_upstream, branch="HEAD") -> bool:
+def can_fast_forward(path: Path, branch_upstream: str, branch: str = "HEAD") -> bool:
     command = ["git", "merge-base", "--is-ancestor", branch, branch_upstream]
     ret = pmb.helpers.run.user(command, path, check=False)
     if ret == 0:
@@ -244,7 +244,7 @@ def parse_channels_cfg(aports: Path) -> dict:
     return ret
 
 
-def branch_looks_official(repo: Path, branch) -> bool:
+def branch_looks_official(repo: Path, branch: str) -> bool:
     """Check if a given branch follows the patterns of official branches in
        pmaports or aports.
 
@@ -344,7 +344,7 @@ def get_topdir(repo: Path) -> Path:
     return Path(res.strip())
 
 
-def get_files(repo: Path):
+def get_files(repo: Path) -> list[str]:
     """Get all files inside a git repository, that are either already in the git tree or are not in gitignore.
 
     Do not list deleted files. To be used for creating a tarball of the git repository.

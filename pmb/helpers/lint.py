@@ -45,7 +45,7 @@ def get_custom_valid_options() -> list[str]:
 # FIXME: dest_paths[repo], repo expected to be a Literal.
 # We should really make Config.mirrors not a TypedDict.
 # mypy: disable-error-code="index"
-def check(pkgnames: Sequence[str]):
+def check(pkgnames: Sequence[str]) -> None:
     """Run apkbuild-lint on the supplied packages.
 
     :param pkgnames: Names of the packages to lint

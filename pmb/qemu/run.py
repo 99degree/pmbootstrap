@@ -21,13 +21,13 @@ import pmb.chroot.initfs
 import pmb.config
 import pmb.config.pmaports
 import pmb.install.losetup
-from pmb.types import PathString, PmbArgs
+from pmb.types import Env, PathString, PmbArgs
 import pmb.helpers.run
 import pmb.parse.cpuinfo
 from pmb.core import Chroot, ChrootType
 
 
-def system_image(device: str):
+def system_image(device: str) -> Path:
     """
     Returns path to rootfs for specified device. In case that it doesn't
     exist, raise and exception explaining how to generate it.
@@ -41,7 +41,7 @@ def system_image(device: str):
     return path
 
 
-def create_second_storage(args: PmbArgs, device: str):
+def create_second_storage(args: PmbArgs, device: str) -> Path:
     """
     Generate a second storage image if it does not exist.
 
@@ -55,7 +55,7 @@ def create_second_storage(args: PmbArgs, device: str):
     return path
 
 
-def which_qemu(arch: Arch):
+def which_qemu(arch: Arch) -> str:
     """
     Finds the qemu executable or raises an exception otherwise
     """
@@ -97,7 +97,13 @@ def create_gdk_loader_cache(args: PmbArgs) -> Path:
     return chroot_native / custom_cache_path
 
 
-def command_qemu(args: PmbArgs, config: Config, arch: Arch, img_path, img_path_2nd=None):
+def command_qemu(
+    args: PmbArgs,
+    config: Config,
+    arch: Arch,
+    img_path: Path,
+    img_path_2nd: Path | None = None,
+) -> tuple[list[str | Path], Env]:
     """
     Generate the full qemu command with arguments to run postmarketOS
     """
@@ -138,6 +144,11 @@ def command_qemu(args: PmbArgs, config: Config, arch: Arch, img_path, img_path_2
     # on systems with more than 8 CPUs
     if not arch.is_native() and ncpus > 8:
         ncpus = 8
+
+    env: Env
+    # It might be tempting to use PathString here, but I don't think it makes sense semantically as
+    # this is not just a list of paths.
+    command: list[str | Path]
 
     if args.host_qemu:
         qemu_bin = which_qemu(arch)
@@ -218,7 +229,7 @@ def command_qemu(args: PmbArgs, config: Config, arch: Arch, img_path, img_path_2
 
     command += ["-drive", f"file={img_path},format=raw,if=virtio"]
     if img_path_2nd:
-        command += ["-drive", "file=" + img_path_2nd + ",format=raw,if=virtio"]
+        command += ["-drive", f"file={img_path_2nd}" + ",format=raw,if=virtio"]
 
     if args.qemu_tablet:
         command += ["-device", "virtio-tablet-pci"]
@@ -319,7 +330,7 @@ def sigterm_handler(number, frame):
     )
 
 
-def install_depends(args: PmbArgs, arch: Arch):
+def install_depends(args: PmbArgs, arch: Arch) -> None:
     """
     Install any necessary qemu dependencies in native chroot
     """
@@ -358,7 +369,7 @@ def install_depends(args: PmbArgs, arch: Arch):
     pmb.chroot.apk.install(depends, chroot)
 
 
-def run(args: PmbArgs):
+def run(args: PmbArgs) -> None:
     """
     Run a postmarketOS image in qemu
     """

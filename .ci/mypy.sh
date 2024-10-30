@@ -11,4 +11,4 @@ fi
 set -x
 
 pip install --break-system-packages --no-warn-script-location mypy
-python -m mypy --color-output --check-untyped-defs pmbootstrap.py
+python -m mypy pmbootstrap.py

@@ -114,7 +114,7 @@ class RepoBootstrap(commands.Command):
 
             bootstrap_stage = int(step.split("bootstrap_", 1)[1])
 
-            def log_wrapper(pkg: BuildQueueItem):
+            def log_wrapper(pkg: BuildQueueItem) -> None:
                 self.log_progress(f"building {pkg['name']}")
 
             packages = self.get_packages(bootstrap_line)

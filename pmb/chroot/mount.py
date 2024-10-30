@@ -15,7 +15,7 @@ from pmb.core import Chroot
 from pmb.core.context import get_context
 
 
-def mount_chroot_image(chroot: Chroot):
+def mount_chroot_image(chroot: Chroot) -> None:
     """Mount an IMAGE type chroot, to modify an existing rootfs image. This
     doesn't support split images yet!"""
     # Make sure everything is nicely unmounted just to be super safe
@@ -42,7 +42,7 @@ def mount_chroot_image(chroot: Chroot):
     logging.info(f"({chroot}) mounted {chroot.name}")
 
 
-def create_device_nodes(chroot: Chroot):
+def create_device_nodes(chroot: Chroot) -> None:
     """
     Create device nodes for null, zero, full, random, urandom in the chroot.
     """
@@ -90,7 +90,7 @@ def create_device_nodes(chroot: Chroot):
         raise RuntimeError(f"Failed to create device nodes in the '{chroot}' chroot.")
 
 
-def mount_dev_tmpfs(chroot: Chroot = Chroot.native()):
+def mount_dev_tmpfs(chroot: Chroot = Chroot.native()) -> None:
     """
     Mount tmpfs inside the chroot's dev folder to make sure we can create
     device nodes, even if the filesystem of the work folder does not support
@@ -116,7 +116,7 @@ def mount_dev_tmpfs(chroot: Chroot = Chroot.native()):
     pmb.helpers.run.root(["ln", "-sf", "/proc/self/fd", f"{dev}/"])
 
 
-def mount(chroot: Chroot):
+def mount(chroot: Chroot) -> None:
     if chroot.type == ChrootType.IMAGE and not pmb.mount.ismount(chroot.path):
         mount_chroot_image(chroot)
 
@@ -154,7 +154,7 @@ def mount(chroot: Chroot):
     )
 
 
-def mount_native_into_foreign(chroot: Chroot):
+def mount_native_into_foreign(chroot: Chroot) -> None:
     source = Chroot.native().path
     target = chroot / "native"
     pmb.helpers.mount.bind(source, target)
@@ -166,7 +166,7 @@ def mount_native_into_foreign(chroot: Chroot):
         # pmb.helpers.run.root(["ln", "-sf", "/native/usr/bin/pigz", "/usr/local/bin/pigz"])
 
 
-def remove_mnt_pmbootstrap(chroot: Chroot):
+def remove_mnt_pmbootstrap(chroot: Chroot) -> None:
     """Safely remove /mnt/pmbootstrap directories from the chroot, without
     running rm -r as root and potentially removing data inside the
     mountpoint in case it was still mounted (bug in pmbootstrap, or user

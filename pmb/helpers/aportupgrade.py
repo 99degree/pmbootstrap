@@ -6,11 +6,18 @@ from pmb.helpers import logging
 import os
 import re
 import urllib.parse
+from typing import TypedDict
 
-from pmb.types import PmbArgs
+from pmb.types import Apkbuild, PmbArgs
 import pmb.helpers.file
 import pmb.helpers.http
 import pmb.helpers.pmaports
+
+
+class PackageVersionInfo(TypedDict):
+    sha: str
+    date: datetime.datetime
+
 
 req_headers: dict[str, str] = {}
 req_headers_github: dict[str, str] = {}
@@ -47,7 +54,7 @@ def init_req_headers() -> None:
         )
 
 
-def get_package_version_info_github(repo_name: str, ref: str | None):
+def get_package_version_info_github(repo_name: str, ref: str | None) -> PackageVersionInfo:
     logging.debug(f"Trying GitHub repository: {repo_name}")
 
     # Get the URL argument to request a special ref, if needed
@@ -63,13 +70,15 @@ def get_package_version_info_github(repo_name: str, ref: str | None):
     commit_date = latest_commit["commit"]["committer"]["date"]
     # Extract the time from the field
     date = datetime.datetime.strptime(commit_date, "%Y-%m-%dT%H:%M:%SZ")
-    return {
-        "sha": latest_commit["sha"],
-        "date": date,
-    }
+    return PackageVersionInfo(
+        sha=latest_commit["sha"],
+        date=date,
+    )
 
 
-def get_package_version_info_gitlab(gitlab_host: str, repo_name: str, ref: str | None):
+def get_package_version_info_gitlab(
+    gitlab_host: str, repo_name: str, ref: str | None
+) -> PackageVersionInfo:
     logging.debug(f"Trying GitLab repository: {repo_name}")
 
     repo_name_safe = urllib.parse.quote(repo_name, safe="")
@@ -89,13 +98,13 @@ def get_package_version_info_gitlab(gitlab_host: str, repo_name: str, ref: str |
     # Extract the time from the field
     # 2019-10-14T09:32:00.000Z / 2019-12-27T07:58:53.000-05:00
     date = datetime.datetime.strptime(commit_date, "%Y-%m-%dT%H:%M:%S.000%z")
-    return {
-        "sha": latest_commit["id"],
-        "date": date,
-    }
+    return PackageVersionInfo(
+        sha=latest_commit["id"],
+        date=date,
+    )
 
 
-def upgrade_git_package(args: PmbArgs, pkgname: str, package) -> None:
+def upgrade_git_package(args: PmbArgs, pkgname: str, package: Apkbuild) -> None:
     """Update _commit/pkgver/pkgrel in a git-APKBUILD (or pretend to do it if args.dry is set).
 
     :param pkgname: the package name
@@ -169,7 +178,7 @@ def upgrade_git_package(args: PmbArgs, pkgname: str, package) -> None:
     return
 
 
-def upgrade_stable_package(args: PmbArgs, pkgname: str, package) -> None:
+def upgrade_stable_package(args: PmbArgs, pkgname: str, package: Apkbuild) -> None:
     """
     Update _commit/pkgver/pkgrel in an APKBUILD (or pretend to do it if
     args.dry is set).
@@ -254,7 +263,7 @@ def upgrade_stable_package(args: PmbArgs, pkgname: str, package) -> None:
     return
 
 
-def upgrade(args: PmbArgs, pkgname, git=True, stable=True) -> None:
+def upgrade(args: PmbArgs, pkgname: str, git: bool = True, stable: bool = True) -> None:
     """Find new versions of a single package and upgrade it.
 
     :param pkgname: the name of the package

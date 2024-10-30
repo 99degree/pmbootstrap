@@ -4,7 +4,7 @@ import logging
 import os
 from pathlib import Path
 import sys
-from typing import Final, TextIO
+from typing import Any, Final, TextIO
 import pmb.config
 from pmb.meta import Cache
 
@@ -24,7 +24,7 @@ VERBOSE: Final[int] = 5
 class log_handler(logging.StreamHandler):
     """Write to stdout and to the already opened log file."""
 
-    def __init__(self, details_to_stdout: bool = False, quiet: bool = False):
+    def __init__(self, details_to_stdout: bool = False, quiet: bool = False) -> None:
         super().__init__()
         self.details_to_stdout = details_to_stdout
         self.quiet = False
@@ -90,7 +90,7 @@ class log_handler(logging.StreamHandler):
             self.handleError(record)
 
 
-def add_verbose_log_level():
+def add_verbose_log_level() -> None:
     """Add a new log level "verbose", which is below "debug".
 
     Also monkeypatch logging, so it can be used with logging.verbose().
@@ -112,7 +112,7 @@ def add_verbose_log_level():
     )
 
 
-def init(logfile: Path, verbose: bool, details_to_stdout: bool = False):
+def init(logfile: Path, verbose: bool, details_to_stdout: bool = False) -> None:
     """Set log format and add the log file descriptor to logfd, add the verbose log level."""
     global logfd
 
@@ -153,7 +153,7 @@ def init(logfile: Path, verbose: bool, details_to_stdout: bool = False):
     logging.debug(f"$ pmbootstrap {' '.join(sys.argv)}")
 
 
-def disable():
+def disable() -> None:
     logger = logging.getLogger()
     logger.disabled = True
 
@@ -162,38 +162,38 @@ def disable():
 # by not calling the (undefined) logging.verbose() function.
 
 
-def critical(msg: object, *args, **kwargs):
+def critical(msg: object, *args: str, **kwargs: Any) -> None:
     logging.critical(msg, *args, **kwargs)
 
 
-def fatal(msg: object, *args, **kwargs):
+def fatal(msg: object, *args: str, **kwargs: Any) -> None:
     logging.fatal(msg, *args, **kwargs)
 
 
-def error(msg: object, *args, **kwargs):
+def error(msg: object, *args: str, **kwargs: Any) -> None:
     logging.error(msg, *args, **kwargs)
 
 
-def warning(msg: object, *args, **kwargs):
+def warning(msg: object, *args: str, **kwargs: Any) -> None:
     logging.warning(msg, *args, **kwargs)
 
 
 @Cache("msg")
-def warn_once(msg: str):
+def warn_once(msg: str) -> None:
     logging.warning(msg)
 
 
-def info(msg: object, *args, **kwargs):
+def info(msg: object, *args: str, **kwargs: Any) -> None:
     logging.info(msg, *args, **kwargs)
 
 
-def debug(msg: object, *args, **kwargs):
+def debug(msg: object, *args: str, **kwargs: Any) -> None:
     logging.debug(msg, *args, **kwargs)
 
 
-def verbose(msg: object, *args, **kwargs):
+def verbose(msg: object, *args: str, **kwargs: Any) -> None:
     logging.verbose(msg, *args, **kwargs)  # type: ignore[attr-defined]
 
 
-def log(level: int, msg: object, *args, **kwargs):
+def log(level: int, msg: object, *args: str, **kwargs: Any) -> None:
     logging.log(level, msg, *args, **kwargs)

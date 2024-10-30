@@ -36,10 +36,13 @@ def install_depends(method: str) -> None:
             ","
         )
 
+    if not isinstance(depends, list):
+        raise RuntimeError(f"depends was {type(depends)}, not a list")
+
     pmb.chroot.apk.install(depends, Chroot.native())
 
 
-def init(device: str, method: str):
+def init(device: str, method: str) -> None:
     install_depends(method)
 
     # Mount folders from host system

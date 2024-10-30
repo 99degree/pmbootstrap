@@ -12,7 +12,7 @@ import pmb.aportgen.core
 import pmb.build
 import pmb.build.autodetect
 import pmb.chroot
-from pmb.types import PathString, PmbArgs
+from pmb.types import Env, PathString, PmbArgs
 import pmb.helpers
 import pmb.helpers.mount
 import pmb.helpers.pmaports
@@ -97,7 +97,7 @@ def find_kbuild_output_dir(function_body):
     )
 
 
-def modify_apkbuild(pkgname: str, aport: Path):
+def modify_apkbuild(pkgname: str, aport: Path) -> None:
     """Modify kernel APKBUILD to package build output from envkernel.sh."""
     work = get_context().config.work
     apkbuild_path = aport / "APKBUILD"
@@ -119,7 +119,9 @@ def modify_apkbuild(pkgname: str, aport: Path):
     pmb.aportgen.core.rewrite(pkgname, apkbuild_path, fields=fields)
 
 
-def run_abuild(context: Context, pkgname: str, arch: Arch, apkbuild_path: Path, kbuild_out):
+def run_abuild(
+    context: Context, pkgname: str, arch: Arch, apkbuild_path: Path, kbuild_out: str
+) -> None:
     """
     Prepare build environment and run abuild.
 
@@ -182,7 +184,7 @@ def run_abuild(context: Context, pkgname: str, arch: Arch, apkbuild_path: Path, 
         if os.path.islink(chroot / "mnt/linux" / kbuild_out) and os.path.lexists(
             chroot / "mnt/linux" / kbuild_out
         ):
-            pmb.chroot.root(["rm", "/mnt/linux" / kbuild_out])
+            pmb.chroot.root(["rm", Path("/mnt/linux", kbuild_out)])
         pmb.chroot.root(["ln", "-s", "/mnt/linux", build_path / "src"])
     pmb.chroot.root(["ln", "-s", kbuild_out_source, build_path / "src" / kbuild_out])
 
@@ -190,10 +192,10 @@ def run_abuild(context: Context, pkgname: str, arch: Arch, apkbuild_path: Path, 
     pmb.helpers.run.root(cmd)
 
     # Create the apk package
-    env = {
+    env: Env = {
         "CARCH": str(arch),
         "CHOST": str(arch),
-        "CBUILD": Arch.native(),
+        "CBUILD": str(Arch.native()),
         "SUDO_APK": "abuild-apk --no-progress",
     }
     cmd = ["abuild", "rootpkg"]
@@ -207,11 +209,11 @@ def run_abuild(context: Context, pkgname: str, arch: Arch, apkbuild_path: Path, 
         if os.path.islink(chroot / "mnt/linux" / kbuild_out) and os.path.lexists(
             chroot / "mnt/linux" / kbuild_out
         ):
-            pmb.chroot.root(["rm", "/mnt/linux" / kbuild_out])
+            pmb.chroot.root(["rm", Path("/mnt/linux", kbuild_out)])
     pmb.chroot.root(["rm", build_path / "src"])
 
 
-def package_kernel(args: PmbArgs):
+def package_kernel(args: PmbArgs) -> None:
     """Frontend for 'pmbootstrap build --envkernel': creates a package from envkernel output."""
     pkgname = args.packages[0]
     if len(args.packages) > 1 or not pkgname.startswith("linux-"):

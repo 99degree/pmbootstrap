@@ -56,7 +56,7 @@ def get_context(allow_failure: bool = False) -> Context:
     return __context
 
 
-def set_context(context: Context):
+def set_context(context: Context) -> None:
     """Set global runtime context."""
     global __context
 

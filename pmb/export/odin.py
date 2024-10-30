@@ -11,7 +11,7 @@ import pmb.helpers.file
 from pmb.core import Chroot, ChrootType
 
 
-def odin(device: str, flavor, folder: Path):
+def odin(device: str, flavor: str, folder: Path) -> None:
     """
     Create Odin flashable tar file with kernel and initramfs
     for devices configured with the flasher method 'heimdall-isorec'

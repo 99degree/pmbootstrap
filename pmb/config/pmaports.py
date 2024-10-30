@@ -6,6 +6,7 @@ from pmb.core.pkgrepo import pkgrepo_default_path, pkgrepo_paths, pkgrepo_relati
 from pmb.helpers import logging
 import os
 import sys
+from typing import cast, Any
 
 import pmb.config
 from pmb.meta import Cache
@@ -14,7 +15,7 @@ import pmb.helpers.pmaports
 import pmb.parse.version
 
 
-def clone():
+def clone() -> None:
     logging.info(
         "Setting up the native chroot and cloning the package build" " recipes (pmaports)..."
     )
@@ -23,7 +24,7 @@ def clone():
     pmb.helpers.git.clone("pmaports")
 
 
-def check_version_pmaports(real):
+def check_version_pmaports(real: str) -> None:
     # Compare versions
     min = pmb.config.pmaports_min_version
     if pmb.parse.version.compare(real, min) >= 0:
@@ -41,7 +42,7 @@ def check_version_pmaports(real):
     raise RuntimeError("Run 'pmbootstrap pull' to update your pmaports.")
 
 
-def check_version_pmbootstrap(min_ver):
+def check_version_pmbootstrap(min_ver: str) -> None:
     # Compare versions
     real = pmb.__version__
     if pmb.parse.version.compare(real, min_ver) >= 0:
@@ -71,7 +72,7 @@ def check_version_pmbootstrap(min_ver):
 
 
 @Cache()
-def read_config_repos():
+def read_config_repos() -> dict[str, configparser.SectionProxy]:
     """Read the sections starting with "repo:" from pmaports.cfg."""
 
     cfg = configparser.ConfigParser()
@@ -88,7 +89,7 @@ def read_config_repos():
 
 
 @Cache("aports")
-def read_config(aports: Path | None = None):
+def read_config(aports: Path | None = None) -> dict[str, Any]:
     """Read and verify pmaports.cfg. If aports is not
     specified and systemd is enabled, the returned channel
     will be the systemd one (e.g. systemd-edge instead of edge)
@@ -128,7 +129,8 @@ def read_config(aports: Path | None = None):
     if systemd:
         ret["channel"] = "systemd-" + ret["channel"]
 
-    return ret
+    # FIXME: This is a hack to work around python/typeshed issue #12919
+    return cast(dict[str, Any], ret)
 
 
 def all_channels() -> list[str]:
@@ -141,7 +143,7 @@ def all_channels() -> list[str]:
     return list(ret)
 
 
-def read_config_channel():
+def read_config_channel() -> dict[str, str]:
     """Get the properties of the currently active channel in pmaports.git.
 
     As specified in channels.cfg (https://postmarketos.org/channels.cfg).
@@ -180,13 +182,13 @@ def read_config_channel():
     )
 
 
-def init():
+def init() -> None:
     if not os.path.exists(pkgrepo_default_path()):
         clone()
     read_config()
 
 
-def switch_to_channel_branch(channel_new):
+def switch_to_channel_branch(channel_new: str) -> bool:
     """Checkout the channel's branch in pmaports.git.
 
     :channel_new: channel name (e.g. "edge", "v21.03")
@@ -236,7 +238,7 @@ def switch_to_channel_branch(channel_new):
     return True
 
 
-def install_githooks():
+def install_githooks() -> None:
     aports = pkgrepo_default_path()
     hooks_dir = aports / ".githooks"
     if not hooks_dir.exists():

@@ -66,7 +66,7 @@ def _compute_progress(line):
     return cur / tot if tot > 0 else 0
 
 
-def apk_with_progress(command: Sequence[PathString], chroot: Chroot | None = None):
+def apk_with_progress(command: Sequence[PathString], chroot: Chroot | None = None) -> None:
     """Run an apk subcommand while printing a progress bar to STDOUT.
 
     :param command: apk subcommand in list form
@@ -86,7 +86,10 @@ def apk_with_progress(command: Sequence[PathString], chroot: Chroot | None = Non
     with pmb.helpers.run.root(["cat", fifo], output="pipe") as p_cat:
         with pmb.helpers.run.root(command_with_progress, output="background") as p_apk:
             while p_apk.poll() is None:
-                line = p_cat.stdout.readline().decode("utf-8")
+                p_cat_stdout = p_cat.stdout
+                if p_cat_stdout is None:
+                    raise RuntimeError("cat process had no stdout?")
+                line = p_cat_stdout.readline().decode("utf-8")
                 progress = _compute_progress(line)
                 pmb.helpers.cli.progress_print(progress)
             pmb.helpers.cli.progress_flush()

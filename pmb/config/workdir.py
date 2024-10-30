@@ -17,7 +17,7 @@ from pmb.core.context import get_context
 from pmb.helpers import logging
 
 
-def chroot_save_init(suffix: Chroot):
+def chroot_save_init(suffix: Chroot) -> None:
     """Save the chroot initialization data in $WORK/workdir.cfg."""
     # Read existing cfg
     cfg = configparser.ConfigParser()
@@ -48,7 +48,7 @@ def chroots_outdated() -> list[Chroot]: ...
 def chroots_outdated(chroot: Chroot) -> bool: ...
 
 
-def chroots_outdated(chroot: Chroot | None = None):
+def chroots_outdated(chroot: Chroot | None = None) -> bool | list[Chroot]:
     """Check if init dates from workdir.cfg indicate that any chroot is
     outdated.
 

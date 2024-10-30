@@ -1,6 +1,5 @@
 import enum
 from pathlib import Path
-from typing import Any
 from pmb.core.pkgrepo import pkgrepo_paths
 import pmb.helpers.run
 import pmb.chroot
@@ -9,6 +8,7 @@ from pmb.core import Context
 from pmb.core.arch import Arch
 from pmb.core.chroot import Chroot
 from pmb.helpers import logging
+from pmb.types import Apkbuild, CrossCompileType, Env
 
 
 class BootstrapStage(enum.IntEnum):
@@ -21,7 +21,9 @@ class BootstrapStage(enum.IntEnum):
     # We don't need explicit representations of the other numbers.
 
 
-def override_source(apkbuild, pkgver, src, chroot: Chroot = Chroot.native()):
+def override_source(
+    apkbuild: Apkbuild, pkgver: str, src: str | None, chroot: Chroot = Chroot.native()
+) -> None:
     """Mount local source inside chroot and append new functions (prepare() etc.)
     to the APKBUILD to make it use the local source.
     """
@@ -132,7 +134,7 @@ def mount_pmaports(chroot: Chroot = Chroot.native()) -> dict[str, Path]:
     return dest_paths
 
 
-def link_to_git_dir(chroot: Chroot):
+def link_to_git_dir(chroot: Chroot) -> None:
     """Make ``/home/pmos/build/.git`` point to the .git dir from pmaports.git, with a
     symlink so abuild does not fail (#1841).
 
@@ -158,7 +160,7 @@ def link_to_git_dir(chroot: Chroot):
     pmb.chroot.user(["ln", "-sf", dest_paths["pmaports"] / ".git", "/home/pmos/build/.git"], chroot)
 
 
-def handle_csum_failure(apkbuild, chroot: Chroot):
+def handle_csum_failure(apkbuild: Apkbuild, chroot: Chroot) -> None:
     csum_fail_path = chroot / "tmp/apkbuild_verify_failed"
     if not csum_fail_path.exists():
         return
@@ -181,17 +183,17 @@ def handle_csum_failure(apkbuild, chroot: Chroot):
 
 def run_abuild(
     context: Context,
-    apkbuild: dict[str, Any],
+    apkbuild: Apkbuild,
     pkgver: str,
-    channel,
+    channel: str,
     arch: Arch,
-    strict=False,
-    force=False,
-    cross=None,
+    strict: bool = False,
+    force: bool = False,
+    cross: CrossCompileType = None,
     suffix: Chroot = Chroot.native(),
-    src=None,
-    bootstrap_stage=BootstrapStage.NONE,
-):
+    src: str | None = None,
+    bootstrap_stage: int = BootstrapStage.NONE,
+) -> None:
     """
     Set up all environment variables and construct the abuild command (all
     depending on the cross-compiler method and target architecture), copy
@@ -234,7 +236,7 @@ def run_abuild(
     )
 
     # Environment variables
-    env = {"CARCH": arch, "SUDO_APK": "abuild-apk --no-progress"}
+    env: Env = {"CARCH": str(arch), "SUDO_APK": "abuild-apk --no-progress"}
     if cross == "native":
         hostspec = arch.alpine_triple()
         env["CROSS_COMPILE"] = hostspec + "-"

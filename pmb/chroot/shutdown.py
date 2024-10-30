@@ -33,7 +33,7 @@ def kill_sccache():
             pmb.chroot.root(["sccache", "--stop-server"])
 
 
-def shutdown_cryptsetup_device(name: str):
+def shutdown_cryptsetup_device(name: str) -> None:
     """
     :param name: cryptsetup device name, usually "pm_crypt" in pmbootstrap
     """

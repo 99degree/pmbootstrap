@@ -107,7 +107,7 @@ class Config:
         else:
             raise ValueError(f"Invalid dotted key: {dotted_key}")
 
-    def __setattr__(self, key: str, value: Any):
+    def __setattr__(self, key: str, value: Any) -> None:
         """Allow for setattr() to be used with a dotted key
         to set nested dictionaries (e.g. "mirrors.alpine")."""
         keys = key.split(".")

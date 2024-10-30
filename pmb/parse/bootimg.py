@@ -1,6 +1,8 @@
 # Copyright 2023 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
 import os
+from typing import TextIO
+
 from pmb.core.context import get_context
 from pmb.helpers import logging
 from pathlib import Path
@@ -9,9 +11,10 @@ import pmb.chroot
 import pmb.chroot.other
 import pmb.chroot.apk
 from pmb.core import Chroot
+from pmb.types import Bootimg, PathString
 
 
-def is_dtb(path) -> bool:
+def is_dtb(path: PathString) -> bool:
     if not os.path.isfile(path):
         return False
     with open(path, "rb") as f:
@@ -19,7 +22,7 @@ def is_dtb(path) -> bool:
         return f.read(4) == b"\xd0\x0d\xfe\xed"
 
 
-def get_mtk_label(path) -> str | None:
+def get_mtk_label(path: PathString) -> str | None:
     """Read the label from the MediaTek header of the kernel or ramdisk inside
     an extracted boot.img.
     :param path: to either the kernel or ramdisk extracted from boot.img
@@ -51,7 +54,7 @@ def get_mtk_label(path) -> str | None:
             return label
 
 
-def get_qcdt_type(path) -> str | None:
+def get_qcdt_type(path: PathString) -> str | None:
     """Get the dt.img type by reading the first four bytes of the file.
     :param path: to the qcdt image extracted from boot.img
     :returns: * None: dt.img is of unknown type
@@ -73,7 +76,7 @@ def get_qcdt_type(path) -> str | None:
             return None
 
 
-def bootimg(path: Path) -> dict[str, str]:
+def bootimg(path: Path) -> Bootimg:
     if not path.exists():
         raise RuntimeError(f"Could not find file '{path}'")
 
@@ -176,8 +179,23 @@ def bootimg(path: Path) -> dict[str, str]:
     # Cleanup
     pmb.chroot.user(["rm", "-r", temp_path])
 
-    return output
+    return Bootimg(
+        cmdline=output["cmdline"],
+        qcdt=output["qcdt"],
+        qcdt_type=output.get("qcdt_type"),
+        dtb_offset=output.get("dtb_offset"),
+        dtb_second=output["dtb_second"],
+        base=output["base"],
+        kernel_offset=output["kernel_offset"],
+        ramdisk_offset=output["ramdisk_offset"],
+        second_offset=output["second_offset"],
+        tags_offset=output["tags_offset"],
+        pagesize=output["pagesize"],
+        header_version=output.get("header_version"),
+        mtk_label_kernel=output["mtk_label_kernel"],
+        mtk_label_ramdisk=output["mtk_label_ramdisk"],
+    )
 
 
-def trim_input(f) -> str:
+def trim_input(f: TextIO) -> str:
     return f.read().replace("\n", "")

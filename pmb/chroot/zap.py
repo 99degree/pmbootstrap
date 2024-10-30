@@ -20,7 +20,7 @@ from pmb.core import Chroot
 from pmb.core.context import get_context
 
 
-def del_chroot(path: Path, confirm=True, dry=False):
+def del_chroot(path: Path, confirm: bool = True, dry: bool = False) -> None:
     if confirm and not pmb.helpers.cli.confirm(f"Remove {path}?"):
         return
     if dry:
@@ -37,16 +37,16 @@ def del_chroot(path: Path, confirm=True, dry=False):
 
 
 def zap(
-    confirm=True,
-    dry=False,
-    pkgs_local=False,
-    http=False,
-    pkgs_local_mismatch=False,
-    pkgs_online_mismatch=False,
-    distfiles=False,
-    rust=False,
-    netboot=False,
-):
+    confirm: bool = True,
+    dry: bool = False,
+    pkgs_local: bool = False,
+    http: bool = False,
+    pkgs_local_mismatch: bool = False,
+    pkgs_online_mismatch: bool = False,
+    distfiles: bool = False,
+    rust: bool = False,
+    netboot: bool = False,
+) -> None:
     """
     Shutdown everything inside the chroots (e.g. adb), umount
     everything and then safely remove folders from the work-directory.

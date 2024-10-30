@@ -6,18 +6,26 @@ import subprocess
 from pmb.core.arch import Arch
 import pmb.helpers.run_core
 from collections.abc import Sequence
-from pmb.types import Env, PathString
+from typing import overload, Literal
+from pmb.types import (
+    Env,
+    PathString,
+    RunOutputType,
+    RunOutputTypeDefault,
+    RunOutputTypePopen,
+    RunReturnType,
+)
 
 
 def user(
     cmd: Sequence[PathString],
     working_dir: Path | None = None,
-    output: str = "log",
+    output: RunOutputType = "log",
     output_return: bool = False,
     check: bool | None = None,
     env: Env = {},
     sudo: bool = False,
-) -> str | int | subprocess.Popen:
+) -> RunReturnType:
     """
     Run a command on the host system as user.
 
@@ -56,7 +64,7 @@ def user(
 def user_output(
     cmd: Sequence[PathString],
     working_dir: Path | None = None,
-    output: str = "log",
+    output: RunOutputType = "log",
     check: bool | None = None,
     env: Env = {},
     sudo: bool = False,
@@ -68,14 +76,47 @@ def user_output(
     return ret
 
 
+@overload
 def root(
     cmd: Sequence[PathString],
-    working_dir=None,
-    output="log",
-    output_return=False,
-    check=None,
-    env={},
-):
+    working_dir: Path | None = ...,
+    output: RunOutputTypePopen = ...,
+    output_return: Literal[False] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+) -> subprocess.Popen: ...
+
+
+@overload
+def root(
+    cmd: Sequence[PathString],
+    working_dir: Path | None = ...,
+    output: RunOutputTypeDefault = ...,
+    output_return: Literal[False] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+) -> int: ...
+
+
+@overload
+def root(
+    cmd: Sequence[PathString],
+    working_dir: Path | None = ...,
+    output: RunOutputType = ...,
+    output_return: Literal[True] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+) -> str: ...
+
+
+def root(
+    cmd: Sequence[PathString],
+    working_dir: Path | None = None,
+    output: RunOutputType = "log",
+    output_return: bool = False,
+    check: bool | None = None,
+    env: Env = {},
+) -> RunReturnType:
     """Run a command on the host system as root, with sudo or doas.
 
     :param env: dict of environment variables to be passed to the command, e.g.

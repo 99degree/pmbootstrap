@@ -8,7 +8,7 @@ import pmb.install
 from pmb.core import Chroot
 
 
-def kernel_flavor_installed(chroot: Chroot, autoinstall=True) -> str | None:
+def kernel_flavor_installed(chroot: Chroot, autoinstall: bool = True) -> str | None:
     """
     Get installed kernel flavor. Optionally install the device's kernel
     beforehand.

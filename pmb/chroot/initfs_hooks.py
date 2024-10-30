@@ -9,7 +9,7 @@ import pmb.chroot.apk
 from pmb.core import Chroot
 
 
-def list_chroot(suffix: Chroot, remove_prefix=True):
+def list_chroot(suffix: Chroot, remove_prefix: bool = True) -> list[str]:
     ret = []
     prefix = pmb.config.initfs_hook_prefix
     for pkgname in pmb.chroot.apk.installed(suffix).keys():
@@ -21,7 +21,7 @@ def list_chroot(suffix: Chroot, remove_prefix=True):
     return ret
 
 
-def list_aports():
+def list_aports() -> list[str]:
     ret = []
     prefix = pmb.config.initfs_hook_prefix
     for path in pkgrepo_iglob(f"*/{prefix}*"):
@@ -29,7 +29,7 @@ def list_aports():
     return ret
 
 
-def ls(suffix: Chroot):
+def ls(suffix: Chroot) -> None:
     hooks_chroot = list_chroot(suffix)
     hooks_aports = list_aports()
 
@@ -38,7 +38,7 @@ def ls(suffix: Chroot):
         logging.info(line)
 
 
-def add(hook, suffix: Chroot):
+def add(hook: str, suffix: Chroot) -> None:
     if hook not in list_aports():
         raise RuntimeError(
             "Invalid hook name!" " Run 'pmbootstrap initfs hook_ls'" " to get a list of all hooks."
@@ -47,14 +47,14 @@ def add(hook, suffix: Chroot):
     pmb.chroot.apk.install([f"{prefix}{hook}"], suffix)
 
 
-def delete(hook, suffix: Chroot):
+def delete(hook: str, suffix: Chroot) -> None:
     if hook not in list_chroot(suffix):
         raise RuntimeError("There is no such hook installed!")
     prefix = pmb.config.initfs_hook_prefix
     pmb.chroot.root(["apk", "del", f"{prefix}{hook}"], suffix)
 
 
-def update(suffix: Chroot):
+def update(suffix: Chroot) -> None:
     """
     Rebuild and update all hooks that are out of date
     """

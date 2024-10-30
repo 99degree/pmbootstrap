@@ -20,7 +20,7 @@ class BumpType(Enum):
 
 
 def package(
-    pkgname: str, reason="", dry: bool = False, bump_type: BumpType = BumpType.PKGREL
+    pkgname: str, reason: str = "", dry: bool = False, bump_type: BumpType = BumpType.PKGREL
 ) -> None:
     """Increase the pkgrel or pkgver in the APKBUILD of a specific package.
 

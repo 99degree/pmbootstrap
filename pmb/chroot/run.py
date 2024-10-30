@@ -3,7 +3,9 @@
 import os
 from pathlib import Path, PurePath
 import shutil
+import subprocess
 from collections.abc import Sequence
+from typing import overload, Literal
 
 import pmb.config
 import pmb.chroot
@@ -11,7 +13,14 @@ import pmb.chroot.binfmt
 import pmb.helpers.run
 import pmb.helpers.run_core
 from pmb.core import Chroot
-from pmb.types import Env, PathString
+from pmb.types import (
+    Env,
+    PathString,
+    RunOutputType,
+    RunOutputTypeDefault,
+    RunOutputTypePopen,
+    RunReturnType,
+)
 
 
 def executables_absolute_path():
@@ -35,13 +44,13 @@ def rootm(
     cmds: Sequence[Sequence[PathString]],
     chroot: Chroot = Chroot.native(),
     working_dir: PurePath = PurePath("/"),
-    output="log",
-    output_return=False,
-    check=None,
-    env={},
-    disable_timeout=False,
-    add_proxy_env_vars=True,
-):
+    output: RunOutputType = "log",
+    output_return: bool = False,
+    check: bool | None = None,
+    env: Env = {},
+    disable_timeout: bool = False,
+    add_proxy_env_vars: bool = True,
+) -> RunReturnType:
     """
     Run a list of commands inside a chroot as root.
 
@@ -110,17 +119,59 @@ def rootm(
     )
 
 
+@overload
+def root(
+    cmds: Sequence[PathString],
+    chroot: Chroot = ...,
+    working_dir: PurePath = ...,
+    output: RunOutputTypePopen = ...,
+    output_return: Literal[False] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+    disable_timeout: bool = ...,
+    add_proxy_env_vars: bool = ...,
+) -> subprocess.Popen: ...
+
+
+@overload
+def root(
+    cmds: Sequence[PathString],
+    chroot: Chroot = ...,
+    working_dir: PurePath = ...,
+    output: RunOutputTypeDefault = ...,
+    output_return: Literal[False] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+    disable_timeout: bool = ...,
+    add_proxy_env_vars: bool = ...,
+) -> int: ...
+
+
+@overload
+def root(
+    cmds: Sequence[PathString],
+    chroot: Chroot = ...,
+    working_dir: PurePath = ...,
+    output: RunOutputType = ...,
+    output_return: Literal[True] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+    disable_timeout: bool = ...,
+    add_proxy_env_vars: bool = ...,
+) -> str: ...
+
+
 def root(
     cmds: Sequence[PathString],
     chroot: Chroot = Chroot.native(),
     working_dir: PurePath = PurePath("/"),
-    output="log",
-    output_return=False,
-    check=None,
-    env={},
-    disable_timeout=False,
-    add_proxy_env_vars=True,
-):
+    output: RunOutputType = "log",
+    output_return: bool = False,
+    check: bool | None = None,
+    env: Env = {},
+    disable_timeout: bool = False,
+    add_proxy_env_vars: bool = True,
+) -> RunReturnType:
     return rootm(
         [cmds],
         chroot,
@@ -138,11 +189,11 @@ def userm(
     cmds: Sequence[Sequence[PathString]],
     chroot: Chroot = Chroot.native(),
     working_dir: Path = Path("/"),
-    output="log",
-    output_return=False,
-    check=None,
-    env={},
-):
+    output: RunOutputType = "log",
+    output_return: bool = False,
+    check: bool | None = None,
+    env: Env = {},
+) -> RunReturnType:
     """
     Run a command inside a chroot as "user". We always use the BusyBox
     implementation of 'su', because other implementations may override the PATH
@@ -162,24 +213,61 @@ def userm(
 
     flat_cmd = pmb.helpers.run_core.flat_cmd(cmds, env=env)
     cmd = ["busybox", "su", "pmos", "-c", flat_cmd]
-    return pmb.chroot.root(
+    # Can't figure out why this one fails :(
+    return pmb.chroot.root(  # type: ignore[call-overload]
         cmd, chroot, working_dir, output, output_return, check, {}, add_proxy_env_vars=False
     )
+
+
+@overload
+def user(
+    cmd: Sequence[PathString],
+    chroot: Chroot = ...,
+    working_dir: Path = ...,
+    output: RunOutputTypePopen = ...,
+    output_return: Literal[False] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+) -> subprocess.Popen: ...
+
+
+@overload
+def user(
+    cmd: Sequence[PathString],
+    chroot: Chroot = ...,
+    working_dir: Path = ...,
+    output: RunOutputTypeDefault = ...,
+    output_return: Literal[False] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+) -> int: ...
+
+
+@overload
+def user(
+    cmd: Sequence[PathString],
+    chroot: Chroot = ...,
+    working_dir: Path = ...,
+    output: RunOutputType = ...,
+    output_return: Literal[True] = ...,
+    check: bool | None = ...,
+    env: Env = ...,
+) -> str: ...
 
 
 def user(
     cmd: Sequence[PathString],
     chroot: Chroot = Chroot.native(),
     working_dir: Path = Path("/"),
-    output="log",
-    output_return=False,
-    check=None,
-    env={},
-):
+    output: RunOutputType = "log",
+    output_return: bool = False,
+    check: bool | None = None,
+    env: Env = {},
+) -> RunReturnType:
     return userm([cmd], chroot, working_dir, output, output_return, check, env)
 
 
-def exists(username, chroot: Chroot = Chroot.native()):
+def exists(username: str, chroot: Chroot = Chroot.native()) -> bool:
     """
     Checks if username exists in the system
 

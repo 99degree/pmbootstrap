@@ -30,7 +30,7 @@ class UsrMerge(enum.Enum):
     OFF = 2
 
 
-def copy_resolv_conf(chroot: Chroot):
+def copy_resolv_conf(chroot: Chroot) -> None:
     """
     Use pythons super fast file compare function (due to caching)
     and copy the /etc/resolv.conf to the chroot, in case it is
@@ -46,7 +46,7 @@ def copy_resolv_conf(chroot: Chroot):
         pmb.helpers.run.root(["touch", resolv_path])
 
 
-def mark_in_chroot(chroot: Chroot = Chroot.native()):
+def mark_in_chroot(chroot: Chroot = Chroot.native()) -> None:
     """
     Touch a flag so we can know when we're running in chroot (and
     don't accidentally flash partitions on our host). This marker
@@ -74,7 +74,7 @@ def init_keys():
             pmb.helpers.run.root(["cp", key, target])
 
 
-def init_usr_merge(chroot: Chroot):
+def init_usr_merge(chroot: Chroot) -> None:
     logging.info(f"({chroot}) merge /usr")
     script = f"{pmb.config.pmb_src}/pmb/data/merge-usr.sh"
     pmb.helpers.run.root(["sh", "-e", script, "CALLED_FROM_PMB", chroot.path])
@@ -104,7 +104,7 @@ def warn_if_chroots_outdated():
 
 
 @Cache("chroot")
-def init(chroot: Chroot, usr_merge=UsrMerge.AUTO):
+def init(chroot: Chroot, usr_merge: UsrMerge = UsrMerge.AUTO) -> None:
     """
     Initialize a chroot by copying the resolv.conf and updating
     /etc/apk/repositories. If /bin/sh is missing, create the chroot from

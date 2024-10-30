@@ -1,15 +1,21 @@
 # Copyright 2024 Caleb Connolly
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import subprocess
 from argparse import Namespace
 from pathlib import Path
-from typing import Literal, TypedDict
+from typing import Any, Literal, TypedDict
 
 from pmb.core.arch import Arch
 
-CrossCompileType = Literal["native"] | Literal["crossdirect"] | None
+CrossCompileType = Literal["native", "crossdirect"] | None
+RunOutputTypeDefault = Literal["log", "stdout", "interactive", "tui", "null"]
+RunOutputTypePopen = Literal["background", "pipe"]
+RunOutputType = RunOutputTypeDefault | RunOutputTypePopen
+RunReturnType = str | int | subprocess.Popen
 PathString = Path | str
 Env = dict[str, PathString]
+Apkbuild = dict[str, Any]
 
 # These types are not definitive / API, they exist to describe the current
 # state of things so that we can improve our type hinting coverage and make
@@ -26,6 +32,23 @@ class PartitionLayout(TypedDict):
 class AportGenEntry(TypedDict):
     prefixes: list[str]
     confirm_overwrite: bool
+
+
+class Bootimg(TypedDict):
+    cmdline: str
+    qcdt: str
+    qcdt_type: str | None
+    dtb_offset: str | None
+    dtb_second: str
+    base: str
+    kernel_offset: str
+    ramdisk_offset: str
+    second_offset: str
+    tags_offset: str
+    pagesize: str
+    header_version: str | None
+    mtk_label_kernel: str
+    mtk_label_ramdisk: str
 
 
 # Property list generated with:

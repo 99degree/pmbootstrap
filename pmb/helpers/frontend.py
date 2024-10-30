@@ -7,7 +7,7 @@ from pmb.helpers import logging
 import os
 from pathlib import Path
 import sys
-from typing import Any, NoReturn
+from typing import cast, Any, NoReturn
 
 import pmb.aportgen
 import pmb.build
@@ -19,7 +19,7 @@ import pmb.chroot.other
 import pmb.ci
 import pmb.config
 from pmb.core import Config
-from pmb.types import PmbArgs
+from pmb.types import Env, PmbArgs, RunOutputType
 import pmb.export
 import pmb.flasher
 import pmb.helpers.aportupgrade
@@ -43,7 +43,7 @@ from pmb.core import ChrootType, Chroot
 from pmb.core.context import get_context
 
 
-def _parse_flavor(device: str, autoinstall=True) -> str:
+def _parse_flavor(device: str, autoinstall: bool = True) -> str:
     """Verify the flavor argument if specified, or return a default value.
 
     :param autoinstall: make sure that at least one kernel flavor is installed
@@ -189,10 +189,13 @@ def chroot(args: PmbArgs) -> None:
     pmb.chroot.init(chroot)
 
     # Xauthority
-    env = {}
+    env: Env = {}
     if args.xauth:
         pmb.chroot.other.copy_xauthority(chroot)
-        env["DISPLAY"] = os.environ.get("DISPLAY")
+        x11_display = os.environ.get("DISPLAY")
+        if x11_display is None:
+            raise AssertionError("$DISPLAY was unset despite that it should be set at this point")
+        env["DISPLAY"] = x11_display
         env["XAUTHORITY"] = "/home/pmos/.Xauthority"
 
     # Install blockdevice
@@ -210,13 +213,16 @@ def chroot(args: PmbArgs) -> None:
 
     pmb.chroot.apk.update_repository_list(chroot, user_repository=True)
 
+    # TODO: Maybe this could be done better.
+    output_type = cast(RunOutputType, args.output)
+
     # Run the command as user/root
     if user:
         logging.info(f"({chroot}) % su pmos -c '" + " ".join(args.command) + "'")
-        pmb.chroot.user(args.command, chroot, output=args.output, env=env)
+        pmb.chroot.user(args.command, chroot, output=output_type, env=env)
     else:
         logging.info(f"({chroot}) % " + " ".join(args.command))
-        pmb.chroot.root(args.command, chroot, output=args.output, env=env)
+        pmb.chroot.root(args.command, chroot, output=output_type, env=env)
 
 
 def config(args: PmbArgs) -> None:

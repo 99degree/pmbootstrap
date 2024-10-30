@@ -4,6 +4,7 @@ import enum
 from pmb.helpers import logging
 import os
 from pathlib import Path
+from typing import Any
 import shlex
 import datetime
 
@@ -17,10 +18,13 @@ import pmb.helpers.run
 import pmb.parse.apkindex
 import pmb.parse.version
 from pmb.core import Chroot
+from pmb.core.arch import Arch
 from pmb.core.context import get_context
 
 
-def copy_to_buildpath(package, chroot: Chroot = Chroot.native(), no_override: bool = False):
+def copy_to_buildpath(
+    package: str, chroot: Chroot = Chroot.native(), no_override: bool = False
+) -> None:
     # Sanity check
     aport = pmb.helpers.pmaports.find(package)
     if not os.path.exists(aport / "APKBUILD"):
@@ -49,7 +53,7 @@ def copy_to_buildpath(package, chroot: Chroot = Chroot.native(), no_override: bo
     pmb.chroot.root(["chown", "-R", "pmos:pmos", "/home/pmos/build"], chroot)
 
 
-def abuild_overrides(apkbuild: Path):
+def abuild_overrides(apkbuild: Path) -> None:
     """Override some abuild functions by patching the APKBUILD file."""
 
     if apkbuild.is_relative_to(get_context().config.work / "cache_git"):
@@ -77,7 +81,7 @@ class BuildStatus(enum.Enum):
         return self in [BuildStatus.OUTDATED, BuildStatus.NEW]
 
 
-def get_status(arch, apkbuild) -> BuildStatus:
+def get_status(arch: Arch | None, apkbuild: dict[str, Any]) -> BuildStatus:
     """Check if the package has already been built.
 
     Compared to abuild's check, this check also works for different architectures.
@@ -170,7 +174,7 @@ def index_repo(arch=None):
         pmb.parse.apkindex.clear_cache(path / "APKINDEX.tar.gz")
 
 
-def configure_abuild(chroot: Chroot, verify=False):
+def configure_abuild(chroot: Chroot, verify: bool = False) -> None:
     """Set the correct JOBS count in ``abuild.conf``.
 
     :param verify: internally used to test if changing the config has worked.
@@ -198,7 +202,7 @@ def configure_abuild(chroot: Chroot, verify=False):
     pmb.chroot.root(["sed", "-i", f"$ a\\{prefix}{jobs}", "/etc/abuild.conf"], chroot)
 
 
-def configure_ccache(chroot: Chroot = Chroot.native(), verify=False):
+def configure_ccache(chroot: Chroot = Chroot.native(), verify: bool = False) -> None:
     """Set the maximum ccache size.
 
     :param verify: internally used to test if changing the config has worked.

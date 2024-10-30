@@ -13,7 +13,7 @@ import pmb.helpers.file
 from pmb.core import Chroot, ChrootType
 
 
-def symlinks(flavor, folder: Path):
+def symlinks(flavor: str, folder: Path) -> None:
     """
     Create convenience symlinks to the rootfs and boot files.
     """

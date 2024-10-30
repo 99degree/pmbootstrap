@@ -11,11 +11,11 @@ import pmb.parse
 import pmb.chroot.apk
 
 
-def is_registered(arch_qemu: Arch):
+def is_registered(arch_qemu: Arch) -> bool:
     return os.path.exists(f"/proc/sys/fs/binfmt_misc/qemu-{arch_qemu}")
 
 
-def register(arch: Arch):
+def register(arch: Arch) -> None:
     """
     Get arch, magic, mask.
     """
@@ -56,7 +56,7 @@ def register(arch: Arch):
     pmb.helpers.run.root(["sh", "-c", 'echo "' + code + '" > ' + register])
 
 
-def unregister(arch: Arch):
+def unregister(arch: Arch) -> None:
     arch_qemu = arch.qemu()
     binfmt_file = "/proc/sys/fs/binfmt_misc/qemu-" + arch_qemu
     if not os.path.exists(binfmt_file):

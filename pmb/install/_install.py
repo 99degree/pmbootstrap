@@ -38,7 +38,7 @@ get_recommends_visited: list[str] = []
 get_selected_providers_visited: list[str] = []
 
 
-def get_subpartitions_size(chroot: Chroot):
+def get_subpartitions_size(chroot: Chroot) -> tuple[int, int]:
     """
     Calculate the size of the boot and root subpartition.
 
@@ -55,7 +55,7 @@ def get_subpartitions_size(chroot: Chroot):
     root = pmb.helpers.other.folder_size(chroot.path) / 1024
     root *= 1.20
     root += 50 + int(config.extra_space)
-    return (boot, root)
+    return (boot, round(root))
 
 
 def get_nonfree_packages(device):
@@ -84,7 +84,7 @@ def get_nonfree_packages(device):
     return ret
 
 
-def get_kernel_package(config: Config):
+def get_kernel_package(config: Config) -> list[str]:
     """
     Get the device's kernel subpackage based on the user's choice in
     "pmbootstrap init".
@@ -110,7 +110,7 @@ def get_kernel_package(config: Config):
     return ["device-" + config.device + "-kernel-" + config.kernel]
 
 
-def copy_files_from_chroot(args: PmbArgs, chroot: Chroot):
+def copy_files_from_chroot(args: PmbArgs, chroot: Chroot) -> None:
     """
     Copy all files from the rootfs chroot to /mnt/install, except
     for the home folder (because /home will contain some empty
@@ -155,7 +155,7 @@ def copy_files_from_chroot(args: PmbArgs, chroot: Chroot):
         pmb.chroot.root(["cp", "-a"] + folders + ["/mnt/install/"], working_dir=mountpoint)
 
 
-def create_home_from_skel(filesystem: str, user: str):
+def create_home_from_skel(filesystem: str, user: str) -> None:
     """
     Create /home/{user} from /etc/skel
     """
@@ -172,7 +172,7 @@ def create_home_from_skel(filesystem: str, user: str):
     pmb.helpers.run.root(["chown", "-R", "10000", home])
 
 
-def configure_apk(args: PmbArgs):
+def configure_apk(args: PmbArgs) -> None:
     """
     Copy over all official keys, and the keys used to compile local packages
     (unless --no-local-pkgs is set). Then copy the corresponding APKINDEX files
@@ -204,7 +204,7 @@ def configure_apk(args: PmbArgs):
     pmb.helpers.run.user(["cat", rootfs / "etc/apk/repositories"])
 
 
-def set_user(config: Config):
+def set_user(config: Config) -> None:
     """
     Create user with UID 10000 if it doesn't exist.
     Usually the ID for the first user created is 1000, but higher ID is
@@ -228,7 +228,7 @@ def set_user(config: Config):
         pmb.chroot.root(["addgroup", config.user, group], chroot)
 
 
-def setup_login_chpasswd_user_from_arg(args: PmbArgs, user: str, chroot: Chroot):
+def setup_login_chpasswd_user_from_arg(args: PmbArgs, user: str, chroot: Chroot) -> None:
     """
     Set the user's password from what the user passed as --password. Make an
     effort to not have the password end up in the log file by writing it to
@@ -251,7 +251,7 @@ def setup_login_chpasswd_user_from_arg(args: PmbArgs, user: str, chroot: Chroot)
     os.unlink(path_outside)
 
 
-def is_root_locked(chroot: Chroot):
+def is_root_locked(chroot: Chroot) -> bool:
     """
     Figure out from /etc/shadow if root is already locked. The output of this
     is stored in the log, so use grep to only log the line for root, not the
@@ -265,7 +265,7 @@ def is_root_locked(chroot: Chroot):
     return shadow_root.startswith("root:!:")
 
 
-def setup_login(args: PmbArgs, config: Config, chroot: Chroot):
+def setup_login(args: PmbArgs, config: Config, chroot: Chroot) -> None:
     """
     Loop until the password for user has been set successfully, and disable
     root login.
@@ -294,7 +294,7 @@ def setup_login(args: PmbArgs, config: Config, chroot: Chroot):
         pmb.chroot.root(["passwd", "-l", "root"], chroot)
 
 
-def copy_ssh_keys(config: Config):
+def copy_ssh_keys(config: Config) -> None:
     """
     If requested, copy user's SSH public keys to the device if they exist
     """
@@ -327,7 +327,7 @@ def copy_ssh_keys(config: Config):
     pmb.helpers.run.root(["chown", "-R", "10000:10000", target])
 
 
-def setup_keymap(config: Config):
+def setup_keymap(config: Config) -> None:
     """
     Set the keymap with the setup-keymap utility if the device requires it
     """
@@ -369,7 +369,7 @@ def setup_keymap(config: Config):
         logging.info("NOTE: No valid keymap specified for device")
 
 
-def setup_timezone(chroot: Chroot, timezone: str):
+def setup_timezone(chroot: Chroot, timezone: str) -> None:
     # We don't care about the arch since it's built for all!
     alpine_conf = pmb.helpers.package.get("alpine-conf", Arch.native())
     version = alpine_conf.version.split("-r")[0]
@@ -387,7 +387,7 @@ def setup_timezone(chroot: Chroot, timezone: str):
     pmb.chroot.root(setup_tz_cmd, chroot)
 
 
-def setup_hostname(device: str, hostname: str | None):
+def setup_hostname(device: str, hostname: str | None) -> None:
     """
     Set the hostname and update localhost address in /etc/hosts
     """
@@ -417,7 +417,7 @@ def setup_hostname(device: str, hostname: str | None):
     pmb.chroot.root(["sed", "-i", "-e", regex, "/etc/hosts"], suffix)
 
 
-def setup_appstream(offline: bool, chroot: Chroot):
+def setup_appstream(offline: bool, chroot: Chroot) -> None:
     """
     If alpine-appstream-downloader has been downloaded, execute it to have
     update AppStream data on new installs
@@ -444,7 +444,7 @@ def setup_appstream(offline: bool, chroot: Chroot):
         )
 
 
-def disable_sshd(chroot: Chroot):
+def disable_sshd(chroot: Chroot) -> None:
     # check=False: rc-update doesn't exit with 0 if already disabled
     pmb.chroot.root(["rc-update", "del", "sshd", "default"], chroot, check=False)
 
@@ -456,7 +456,7 @@ def disable_sshd(chroot: Chroot):
         raise RuntimeError(f"Failed to disable sshd service: {sshd_files}")
 
 
-def print_sshd_info(args: PmbArgs):
+def print_sshd_info(args: PmbArgs) -> None:
     logging.info("")  # make the note stand out
     logging.info("*** SSH DAEMON INFORMATION ***")
 
@@ -480,7 +480,7 @@ def print_sshd_info(args: PmbArgs):
         logging.info("More info: https://postmarketos.org/ondev-debug")
 
 
-def disable_firewall(chroot: Chroot):
+def disable_firewall(chroot: Chroot) -> None:
     # check=False: rc-update doesn't exit with 0 if already disabled
     pmb.chroot.root(["rc-update", "del", "nftables", "default"], chroot, check=False)
 
@@ -492,7 +492,7 @@ def disable_firewall(chroot: Chroot):
         raise RuntimeError(f"Failed to disable firewall: {nftables_files}")
 
 
-def print_firewall_info(disabled: bool, arch: Arch):
+def print_firewall_info(disabled: bool, arch: Arch) -> None:
     pmaports_cfg = pmb.config.pmaports.read_config()
     pmaports_ok = pmaports_cfg.get("supported_firewall", None) == "nftables"
 
@@ -532,7 +532,7 @@ def print_firewall_info(disabled: bool, arch: Arch):
     logging.info("For more information: https://postmarketos.org/firewall")
 
 
-def generate_binary_list(args: PmbArgs, chroot: Chroot, step):
+def generate_binary_list(args: PmbArgs, chroot: Chroot, step: int) -> list[tuple[str, int]]:
     """
     Perform three checks prior to writing binaries to disk: 1) that binaries
     exist, 2) that binaries do not extend into the first partition, 3) that
@@ -587,7 +587,7 @@ def generate_binary_list(args: PmbArgs, chroot: Chroot, step):
     return binary_list
 
 
-def embed_firmware(args: PmbArgs, suffix: Chroot):
+def embed_firmware(args: PmbArgs, suffix: Chroot) -> None:
     """
     This method will embed firmware, located at /usr/share, that are specified
     by the "sd_embed_firmware" deviceinfo parameter into the SD card image
@@ -626,7 +626,7 @@ def embed_firmware(args: PmbArgs, suffix: Chroot):
         )
 
 
-def write_cgpt_kpart(args: PmbArgs, layout, suffix: Chroot):
+def write_cgpt_kpart(args: PmbArgs, layout: PartitionLayout, suffix: Chroot) -> None:
     """
     Write the kernel to the ChromeOS kernel partition.
 
@@ -658,7 +658,7 @@ def sanity_check_boot_size():
     sys.exit(1)
 
 
-def sanity_check_disk(args: PmbArgs):
+def sanity_check_disk(args: PmbArgs) -> None:
     device = args.disk
     device_name = os.path.basename(device)
     if not os.path.exists(device):
@@ -670,7 +670,7 @@ def sanity_check_disk(args: PmbArgs):
             raise RuntimeError(f"{device} is read-only, maybe a locked SD card?")
 
 
-def sanity_check_disk_size(args: PmbArgs):
+def sanity_check_disk_size(args: PmbArgs) -> None:
     device = args.disk
     devpath = os.path.realpath(device)
     sysfs = "/sys/class/block/{}/size".format(devpath.replace("/dev/", ""))
@@ -697,13 +697,13 @@ def sanity_check_disk_size(args: PmbArgs):
             raise RuntimeError("Aborted.")
 
 
-def get_ondev_pkgver(args: PmbArgs):
+def get_ondev_pkgver(args: PmbArgs) -> str:
     arch = pmb.parse.deviceinfo().arch
     package = pmb.helpers.package.get("postmarketos-ondev", arch)
     return package.version.split("-r")[0]
 
 
-def sanity_check_ondev_version(args: PmbArgs):
+def sanity_check_ondev_version(args: PmbArgs) -> None:
     ver_pkg = get_ondev_pkgver(args)
     ver_min = pmb.config.ondev_min_version
     if pmb.parse.version.compare(ver_pkg, ver_min) == -1:
@@ -715,7 +715,7 @@ def sanity_check_ondev_version(args: PmbArgs):
         )
 
 
-def get_partition_layout(reserve, kernel):
+def get_partition_layout(reserve: bool | int, kernel: bool) -> PartitionLayout:
     """
     :param reserve: create an empty partition between root and boot (pma#463)
     :param kernel: create a separate kernel partition before all other
@@ -741,7 +741,7 @@ def get_partition_layout(reserve, kernel):
     return ret
 
 
-def get_uuid(args: PmbArgs, partition: Path):
+def get_uuid(args: PmbArgs, partition: Path) -> str:
     """
     Get UUID of a partition
 
@@ -760,7 +760,7 @@ def get_uuid(args: PmbArgs, partition: Path):
     ).rstrip()
 
 
-def create_crypttab(args: PmbArgs, layout, chroot: Chroot):
+def create_crypttab(args: PmbArgs, layout: PartitionLayout, chroot: Chroot) -> None:
     """
     Create /etc/crypttab config
 
@@ -776,7 +776,7 @@ def create_crypttab(args: PmbArgs, layout, chroot: Chroot):
     pmb.chroot.root(["mv", "/tmp/crypttab", "/etc/crypttab"], chroot)
 
 
-def create_fstab(args: PmbArgs, layout, chroot: Chroot):
+def create_fstab(args: PmbArgs, layout: PartitionLayout, chroot: Chroot) -> None:
     """
     Create /etc/fstab config
 
@@ -832,15 +832,15 @@ def create_fstab(args: PmbArgs, layout, chroot: Chroot):
 
 def install_system_image(
     args: PmbArgs,
-    size_reserve,
+    size_reserve: int,
     chroot: Chroot,
-    step,
-    steps,
-    boot_label="pmOS_boot",
-    root_label="pmOS_root",
-    split=False,
+    step: int,
+    steps: int,
+    boot_label: str = "pmOS_boot",
+    root_label: str = "pmOS_root",
+    split: bool = False,
     disk: Path | None = None,
-):
+) -> None:
     """
     :param size_reserve: empty partition between root and boot in MiB (pma#463)
     :param suffix: the chroot suffix, where the rootfs that will be installed
@@ -859,7 +859,7 @@ def install_system_image(
     pmb.helpers.mount.umount_all(chroot.path)
     (size_boot, size_root) = get_subpartitions_size(chroot)
     layout = get_partition_layout(
-        size_reserve, pmb.parse.deviceinfo().cgpt_kpart and args.install_cgpt
+        size_reserve, bool(pmb.parse.deviceinfo().cgpt_kpart and args.install_cgpt)
     )
     if not args.rsync:
         pmb.install.blockdevice.create(args, size_boot, size_root, size_reserve, split, disk)
@@ -944,7 +944,7 @@ def install_system_image(
             pmb.chroot.user(["mv", "-f", sys_image_patched, sys_image], working_dir=workdir)
 
 
-def print_flash_info(device: str, deviceinfo: Deviceinfo, split: bool, have_disk: bool):
+def print_flash_info(device: str, deviceinfo: Deviceinfo, split: bool, have_disk: bool) -> None:
     """Print flashing information, based on the deviceinfo data and the
     pmbootstrap arguments."""
     logging.info("")  # make the note stand out
@@ -1042,7 +1042,7 @@ def print_flash_info(device: str, deviceinfo: Deviceinfo, split: bool, have_disk
     )
 
 
-def install_recovery_zip(args: PmbArgs, device: str, arch: Arch, steps):
+def install_recovery_zip(args: PmbArgs, device: str, arch: Arch, steps: int) -> None:
     logging.info(f"*** ({steps}/{steps}) CREATING RECOVERY-FLASHABLE ZIP ***")
     chroot = Chroot(ChrootType.BUILDROOT, arch)
     mount_device_rootfs(Chroot.rootfs(device), chroot)
@@ -1054,7 +1054,7 @@ def install_recovery_zip(args: PmbArgs, device: str, arch: Arch, steps):
     logging.info("https://postmarketos.org/recoveryzip")
 
 
-def install_on_device_installer(args: PmbArgs, step, steps):
+def install_on_device_installer(args: PmbArgs, step: int, steps: int) -> None:
     # Generate the rootfs image
     config = get_context().config
     if not args.ondev_no_rootfs:
@@ -1136,7 +1136,7 @@ def install_on_device_installer(args: PmbArgs, step, steps):
     )
 
 
-def get_selected_providers(args: PmbArgs, packages):
+def get_selected_providers(args: PmbArgs, packages: list[str]) -> list[str]:
     """
     Look through the specified packages and see which providers were selected
     in "pmbootstrap init". Install those as extra packages to select them
@@ -1182,7 +1182,7 @@ def get_selected_providers(args: PmbArgs, packages):
     return ret
 
 
-def get_recommends(args: PmbArgs, packages) -> Sequence[str]:
+def get_recommends(args: PmbArgs, packages: list[str]) -> Sequence[str]:
     """
     Look through the specified packages and collect additional packages
     specified under _pmb_recommends in them. This is recursive, so it will dive
@@ -1240,7 +1240,7 @@ def get_recommends(args: PmbArgs, packages) -> Sequence[str]:
     return ret
 
 
-def create_device_rootfs(args: PmbArgs, step, steps):
+def create_device_rootfs(args: PmbArgs, step: int, steps: int) -> None:
     # list all packages to be installed (including the ones specified by --add)
     # and upgrade the installed packages/apkindexes
     context = get_context()
@@ -1348,7 +1348,7 @@ def create_device_rootfs(args: PmbArgs, step, steps):
         disable_firewall(chroot)
 
 
-def install(args: PmbArgs):
+def install(args: PmbArgs) -> None:
     device = get_context().config.device
     chroot = Chroot(ChrootType.ROOTFS, device)
     deviceinfo = pmb.parse.deviceinfo()

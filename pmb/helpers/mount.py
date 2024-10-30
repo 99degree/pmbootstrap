@@ -4,6 +4,7 @@ import os
 from pathlib import Path, PurePath
 import pmb.helpers
 from pmb.core import Chroot
+from pmb.types import PathString
 import pmb.helpers.run
 
 
@@ -24,7 +25,7 @@ def ismount(folder: Path) -> bool:
 
 
 def bind(
-    source: Path, destination: Path, create_folders: bool = True, umount: bool = False
+    source: PathString, destination: Path, create_folders: bool = True, umount: bool = False
 ) -> None:
     """Mount --bind a folder and create necessary directory structure.
 

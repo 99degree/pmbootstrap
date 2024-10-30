@@ -13,9 +13,10 @@ import pmb.chroot.apk
 import pmb.helpers.run
 from pmb.core import Chroot
 from pmb.core.context import get_context
+from pmb.types import CrossCompileType
 
 
-def init_abuild_minimal(chroot: Chroot = Chroot.native(), build_pkgs: list[str] = []):
+def init_abuild_minimal(chroot: Chroot = Chroot.native(), build_pkgs: list[str] = []) -> None:
     """Initialize a minimal chroot with abuild where one can do 'abuild checksum'."""
     marker = chroot / "tmp/pmb_chroot_abuild_init_done"
     if os.path.exists(marker):
@@ -111,7 +112,9 @@ def init(chroot: Chroot = Chroot.native()) -> bool:
     return True
 
 
-def init_compiler(context: Context, depends, cross, arch: Arch):
+def init_compiler(
+    context: Context, depends: list[str], cross: CrossCompileType, arch: Arch
+) -> None:
     arch_str = str(arch)
     cross_pkgs = ["ccache-cross-symlinks", "abuild"]
     if "gcc4" in depends:

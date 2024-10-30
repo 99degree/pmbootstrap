@@ -12,7 +12,7 @@ def variables(
     no_reboot: bool | None,
     partition: str | None,
     resume: bool | None,
-) -> dict[str, str]:
+) -> dict[str, str | None]:
     device = get_context().config.device
     deviceinfo = pmb.parse.deviceinfo()
     _cmdline = deviceinfo.kernel_cmdline or ""

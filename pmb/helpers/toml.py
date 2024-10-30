@@ -1,5 +1,7 @@
 # Copyright 2024 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
+from pathlib import Path
+
 from pmb.meta import Cache
 from pmb.helpers.exceptions import NonBugError
 
@@ -12,7 +14,7 @@ except ImportError:
 
 
 @Cache("path")
-def load_toml_file(path) -> dict:
+def load_toml_file(path: Path) -> dict:
     """Read a toml file into a dict and show the path on error."""
     with open(path, mode="rb") as f:
         try:

@@ -3,7 +3,7 @@
 import fcntl
 from pmb.core.context import get_context
 from pmb.core.arch import Arch
-from pmb.types import PathString, Env
+from pmb.types import PathString, Env, RunOutputType
 from pmb.helpers import logging
 import os
 from pathlib import Path
@@ -14,6 +14,7 @@ import sys
 import threading
 import time
 from collections.abc import Sequence
+from typing import overload, Literal
 import pmb.helpers.run
 
 """For a detailed description of all output modes, read the description of
@@ -21,7 +22,9 @@ import pmb.helpers.run
    called by core(). """
 
 
-def flat_cmd(cmds: Sequence[Sequence[PathString]], working_dir: Path | None = None, env: Env = {}):
+def flat_cmd(
+    cmds: Sequence[Sequence[PathString]], working_dir: Path | None = None, env: Env = {}
+) -> str:
     """Convert a shell command passed as list into a flat shell string with proper escaping.
 
     :param cmds: list of commands as list, e.g. ["echo", "string with spaces"]
@@ -52,7 +55,9 @@ def flat_cmd(cmds: Sequence[Sequence[PathString]], working_dir: Path | None = No
     return ret
 
 
-def sanity_checks(output="log", output_return=False, check=None):
+def sanity_checks(
+    output: RunOutputType = "log", output_return: bool = False, check: bool | None = None
+) -> None:
     """Raise an exception if the parameters passed to core() don't make sense.
 
     (all parameters are described in core() below).
@@ -94,14 +99,33 @@ def pipe(cmd, working_dir=None):
     return ret
 
 
-# FIXME (#2324): These types make no sense at all
+@overload
 def pipe_read(
-    process,
-    output_to_stdout=False,
-    output_log=True,
-    output_return=False,
-    output_return_buffer=False,
-):
+    process: subprocess.Popen,
+    output_to_stdout: bool = ...,
+    output_log: bool = ...,
+    output_return: Literal[False] = ...,
+    output_return_buffer: None = ...,
+) -> None: ...
+
+
+@overload
+def pipe_read(
+    process: subprocess.Popen,
+    output_to_stdout: bool = ...,
+    output_log: bool = ...,
+    output_return: Literal[True] = ...,
+    output_return_buffer: list[bytes] = ...,
+) -> None: ...
+
+
+def pipe_read(
+    process: subprocess.Popen,
+    output_to_stdout: bool = False,
+    output_log: bool = True,
+    output_return: bool = False,
+    output_return_buffer: list[bytes] | None = None,
+) -> None:
     """Read all output from a subprocess, copy it to the log and optionally stdout and a buffer variable.
 
     This is only meant to be called by foreground_pipe() below.
@@ -115,13 +139,18 @@ def pipe_read(
     """
     while True:
         # Copy available output
-        out = process.stdout.readline()
+        process_stdout = process.stdout
+        if process_stdout is None:
+            raise RuntimeError("subprocess has no stdout?")
+        out = process_stdout.readline()
         if len(out):
             if output_log:
                 pmb.helpers.logging.logfd.buffer.write(out)
             if output_to_stdout:
                 sys.stdout.buffer.write(out)
             if output_return:
+                if output_return_buffer is None:
+                    raise AssertionError
                 output_return_buffer.append(out)
             continue
 

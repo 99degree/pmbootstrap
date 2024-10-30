@@ -6,7 +6,7 @@ from pmb.helpers import logging
 import os
 from pathlib import Path
 import pmb.chroot
-from pmb.types import PmbArgs
+from pmb.types import Env, PmbArgs
 import pmb.helpers.cli
 from pmb.core import Chroot
 
@@ -176,7 +176,7 @@ def run_scripts(topdir, scripts):
                 copy_git_repo_to_chroot(topdir)
                 repo_copied = True
 
-            env = {"TESTUSER": "pmos"}
+            env: Env = {"TESTUSER": "pmos"}
             rc = pmb.chroot.root(
                 [script_path], check=False, env=env, working_dir=Path("/home/pmos/ci"), output="tui"
             )

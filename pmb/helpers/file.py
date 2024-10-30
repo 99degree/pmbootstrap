@@ -10,7 +10,7 @@ import pmb.helpers.run
 import pmb.helpers.pmaports
 
 
-def replace(path: Path, old: str, new: str):
+def replace(path: Path, old: str, new: str) -> None:
     text = ""
     with path.open("r", encoding="utf-8") as handle:
         text = handle.read()
@@ -21,7 +21,9 @@ def replace(path: Path, old: str, new: str):
         handle.write(text)
 
 
-def replace_apkbuild(args: PmbArgs, pkgname, key, new, in_quotes=False):
+def replace_apkbuild(
+    args: PmbArgs, pkgname: str, key: str, new: int | str, in_quotes: bool = False
+) -> None:
     """Replace one key=value line in an APKBUILD and verify it afterwards.
 
     :param pkgname: package name, e.g. "hello-world"
@@ -90,7 +92,7 @@ def is_older_than(path, seconds):
     return lastmod + seconds < time.time()
 
 
-def symlink(file: Path, link: Path):
+def symlink(file: Path, link: Path) -> None:
     """Check if the symlink is already present, otherwise create it."""
     if os.path.exists(link):
         if os.path.islink(link) and os.path.realpath(os.readlink(link)) == os.path.realpath(file):

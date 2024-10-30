@@ -3,6 +3,7 @@
 # mypy: disable-error-code="attr-defined"
 from pmb.core.context import get_context
 from pmb.helpers import logging
+from pmb.types import Apkbuild
 import os
 from pathlib import Path
 import re
@@ -31,7 +32,7 @@ revar4 = re.compile(r"\${([a-zA-Z_]+[a-zA-Z0-9_]*)#(.*)}")
 revar5 = re.compile(r"([a-zA-Z_]+[a-zA-Z0-9_]*)=")
 
 
-def replace_variable(apkbuild, value: str) -> str:
+def replace_variable(apkbuild: Apkbuild, value: str) -> str:
     def log_key_not_found(match):
         logging.verbose(
             f"{apkbuild['pkgname']}: key '{match.group(1)}' for"
@@ -95,7 +96,7 @@ def replace_variable(apkbuild, value: str) -> str:
     return value
 
 
-def function_body(path: Path, func: str):
+def function_body(path: Path, func: str) -> list[str]:
     """
     Get the body of a function in an APKBUILD.
 
@@ -120,7 +121,7 @@ def function_body(path: Path, func: str):
     return func_body
 
 
-def read_file(path: Path):
+def read_file(path: Path) -> list[str]:
     """
     Read an APKBUILD file
 
@@ -321,7 +322,7 @@ def _parse_subpackage(path, lines, apkbuild, subpackages, subpkg):
 
 
 @Cache("path")
-def apkbuild(path: Path, check_pkgver=True, check_pkgname=True):
+def apkbuild(path: Path, check_pkgver: bool = True, check_pkgname: bool = True) -> Apkbuild:
     """
     Parse relevant information out of the APKBUILD file. This is not meant
     to be perfect and catch every edge case (for that, a full shell parser
@@ -371,7 +372,7 @@ def apkbuild(path: Path, check_pkgver=True, check_pkgname=True):
     return ret
 
 
-def kernels(device: str):
+def kernels(device: str) -> dict[str, str] | None:
     """
     Get the possible kernels from a device-* APKBUILD.
 

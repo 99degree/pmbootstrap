@@ -5,7 +5,7 @@ from pathlib import Path
 from pmb.core.pkgrepo import pkgrepo_glob_one, pkgrepo_iglob
 
 
-def find_path(codename: str, file="") -> Path | None:
+def find_path(codename: str, file: str = "") -> Path | None:
     """Find path to device APKBUILD under `device/*/device-`.
 
     :param codename: device codename
@@ -36,7 +36,7 @@ def list_codenames(vendor=None, archived=True):
     return ret
 
 
-def list_vendors():
+def list_vendors() -> set[str]:
     """Get all device vendors, for which aports are available.
 
     :returns: {"vendor1", "vendor2", ...}

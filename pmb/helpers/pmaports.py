@@ -18,7 +18,7 @@ from pmb.meta import Cache
 import pmb.parse
 
 
-def _find_apkbuilds(skip_extra_repos=False) -> dict[str, Path]:
+def _find_apkbuilds(skip_extra_repos: bool = False) -> dict[str, Path]:
     # Try to get a cached result first (we assume that the aports don't change
     # in one pmbootstrap call)
     apkbuilds = pmb.helpers.other.cache.get("pmb.helpers.pmaports.apkbuilds")
@@ -50,7 +50,7 @@ def get_list() -> list[str]:
     return list(_find_apkbuilds().keys())
 
 
-def guess_main_dev(subpkgname) -> Path | None:
+def guess_main_dev(subpkgname: str) -> Path | None:
     """Check if a package without "-dev" at the end exists in pmaports or not, and log the appropriate message.
 
     Don't call this function directly, use guess_main() instead.
@@ -76,7 +76,7 @@ def guess_main_dev(subpkgname) -> Path | None:
     return None
 
 
-def guess_main(subpkgname) -> Path | None:
+def guess_main(subpkgname: str) -> Path | None:
     """Find the main package by assuming it is a prefix of the subpkgname.
 
     We do that, because in some APKBUILDs the subpkgname="" variable gets
@@ -243,7 +243,9 @@ def get_with_path(
     return None, None
 
 
-def get(pkgname, must_exist=True, subpackages=True, skip_extra_repos=False) -> dict[str, Any]:
+def get(
+    pkgname: str, must_exist: bool = True, subpackages: bool = True, skip_extra_repos: bool = False
+) -> dict[str, Any]:
     return get_with_path(pkgname, must_exist, subpackages, skip_extra_repos)[1]
 
 
@@ -273,7 +275,7 @@ def find_providers(provide: str, default: list[str]) -> list[tuple[Any, Any]]:
     return sorted(providers.items(), reverse=True, key=lambda p: p[1].get("provider_priority", 0))
 
 
-def get_repo(pkgname) -> str | None:
+def get_repo(pkgname: str) -> str | None:
     """Get the repository folder of an aport.
 
     :pkgname: package name
@@ -289,7 +291,7 @@ def get_repo(pkgname) -> str | None:
     return None
 
 
-def check_arches(arches, arch: Arch):
+def check_arches(arches: list[str], arch: Arch) -> bool:
     """Check if building for a certain arch is allowed.
 
     :param arches: list of all supported arches, as it can be found in the

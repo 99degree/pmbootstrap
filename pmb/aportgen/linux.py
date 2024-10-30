@@ -7,7 +7,7 @@ import pmb.aportgen.core
 import pmb.parse.apkindex
 
 
-def generate_apkbuild(pkgname: str, deviceinfo: Deviceinfo, patches: list[str]):
+def generate_apkbuild(pkgname: str, deviceinfo: Deviceinfo, patches: list[str]) -> None:
     device = "-".join(pkgname.split("-")[1:])
     carch = deviceinfo.arch.kernel()
 
@@ -117,7 +117,7 @@ def generate_apkbuild(pkgname: str, deviceinfo: Deviceinfo, patches: list[str]):
             hndl.write(line[8:].replace(" " * 4, "\t") + "\n")
 
 
-def generate(pkgname: str):
+def generate(pkgname: str) -> None:
     device = "-".join(pkgname.split("-")[1:])
     deviceinfo = pmb.parse.deviceinfo(device)
     work = get_context().config.work

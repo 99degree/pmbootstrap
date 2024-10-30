@@ -18,6 +18,7 @@ import pmb.helpers.pmaports
 import pmb.helpers.run
 import pmb.parse
 from pmb.core import Chroot
+from pmb.types import Apkbuild, Env
 
 
 class KConfigUI(enum.Enum):
@@ -45,7 +46,7 @@ class KConfigUI(enum.Enum):
         return self.value
 
 
-def get_arch(apkbuild: dict[str, Any]) -> Arch:
+def get_arch(apkbuild: Apkbuild) -> Arch:
     """Take the architecture from the APKBUILD or complain if it's ambiguous.
 
     This function only gets called if --arch is not set.
@@ -76,7 +77,7 @@ def get_arch(apkbuild: dict[str, Any]) -> Arch:
     return Arch.from_str(apkbuild["arch"][0])
 
 
-def get_outputdir(pkgname: str, apkbuild: dict[str, Any]) -> Path:
+def get_outputdir(pkgname: str, apkbuild: Apkbuild) -> Path:
     """Get the folder for the kernel compilation output.
 
     For most APKBUILDs, this is $builddir. But some older ones still use
@@ -121,7 +122,7 @@ def get_outputdir(pkgname: str, apkbuild: dict[str, Any]) -> Path:
     )
 
 
-def extract_and_patch_sources(pkgname: str, arch) -> None:
+def extract_and_patch_sources(pkgname: str, arch: Arch) -> None:
     pmb.build.copy_to_buildpath(pkgname)
     logging.info("(native) extract kernel source")
     pmb.chroot.user(["abuild", "unpack"], working_dir=Path("/home/pmos/build"))
@@ -130,11 +131,18 @@ def extract_and_patch_sources(pkgname: str, arch) -> None:
         ["abuild", "prepare"],
         working_dir=Path("/home/pmos/build"),
         output="interactive",
-        env={"CARCH": arch},
+        env={"CARCH": str(arch)},
     )
 
 
-def _make(chroot: pmb.core.Chroot, make_command: str, env, pkgname, arch, apkbuild) -> None:
+def _make(
+    chroot: pmb.core.Chroot,
+    make_command: str,
+    env: Env,
+    pkgname: str,
+    arch: Arch,
+    apkbuild: Apkbuild,
+) -> None:
     aport = pmb.helpers.pmaports.find(pkgname)
     outputdir = get_outputdir(pkgname, apkbuild)
 
@@ -155,7 +163,7 @@ def _make(chroot: pmb.core.Chroot, make_command: str, env, pkgname, arch, apkbui
     pmb.build.checksum.update(pkgname)
 
 
-def _init(pkgname: str, arch: Arch | None) -> tuple[str, Arch, Any, Chroot, dict[str, str]]:
+def _init(pkgname: str, arch: Arch | None) -> tuple[str, Arch, Any, Chroot, Env]:
     """
     :returns: pkgname, arch, apkbuild, chroot, env
     """

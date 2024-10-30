@@ -32,8 +32,11 @@ from pmb.helpers.exceptions import NonBugError
 
 @Cache("chroot", "user_repository", mirrors_exclude=[])
 def update_repository_list(
-    chroot: Chroot, user_repository=False, mirrors_exclude: list[str] = [], check=False
-):
+    chroot: Chroot,
+    user_repository: bool = False,
+    mirrors_exclude: list[str] = [],
+    check: bool = False,
+) -> None:
     """
     Update /etc/apk/repositories, if it is outdated (when the user changed the
     --mirror-alpine or --mirror-pmOS parameters).
@@ -79,7 +82,7 @@ def update_repository_list(
 
 
 @Cache("chroot")
-def check_min_version(chroot: Chroot = Chroot.native()):
+def check_min_version(chroot: Chroot = Chroot.native()) -> None:
     """
     Check the minimum apk version, before running it the first time in the
     current session (lifetime of one pmbootstrap call).
@@ -179,7 +182,9 @@ def packages_get_locally_built_apks(package_list: list[str], arch: Arch) -> list
 
 # FIXME: list[Sequence[PathString]] weirdness
 # mypy: disable-error-code="operator"
-def install_run_apk(to_add: list[str], to_add_local: list[Path], to_del: list[str], chroot: Chroot):
+def install_run_apk(
+    to_add: list[str], to_add_local: list[Path], to_del: list[str], chroot: Chroot
+) -> None:
     """
     Run apk to add packages, and ensure only the desired packages get
     explicitly marked as installed.
@@ -248,7 +253,7 @@ def install_run_apk(to_add: list[str], to_add_local: list[Path], to_del: list[st
             pmb.chroot.root(["apk", "--no-progress"] + command, chroot)
 
 
-def install(packages, chroot: Chroot, build=True, quiet: bool = False):
+def install(packages: list[str], chroot: Chroot, build: bool = True, quiet: bool = False) -> None:
     """
     Install packages from pmbootstrap's local package index or the pmOS/Alpine
     binary package mirrors. Iterate over all dependencies recursively, and

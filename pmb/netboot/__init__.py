@@ -12,7 +12,7 @@ import pmb.helpers.run
 from pmb.core import Chroot
 
 
-def start_nbd_server(device: str, replace: bool, ip="172.16.42.2", port=9999):
+def start_nbd_server(device: str, replace: bool, ip: str = "172.16.42.2", port: int = 9999) -> None:
     """
     Start nbd server in chroot_native with pmOS rootfs.
     :param ip: IP address to serve nbd server for

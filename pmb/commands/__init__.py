@@ -55,7 +55,7 @@ unmigrated_commands = [
 ]
 
 
-def run_command(args: PmbArgs):
+def run_command(args: PmbArgs) -> None:
     # Handle deprecated command format
     if args.action in unmigrated_commands:
         getattr(frontend, args.action)(args)

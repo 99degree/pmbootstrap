@@ -9,7 +9,7 @@ from pmb.types import PmbArgs
 from pmb.core.context import get_context
 
 
-def print_status_line(key: str, value: str):
+def print_status_line(key: str, value: str) -> None:
     styles = pmb.config.styles
     key = f"{styles['GREEN']}{key}{styles['END']}:"
     padding = 17

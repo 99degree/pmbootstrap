@@ -50,7 +50,7 @@ def load(path: Path) -> Config:
     return config
 
 
-def serialize(config: Config, skip_defaults=True) -> configparser.ConfigParser:
+def serialize(config: Config, skip_defaults: bool = True) -> configparser.ConfigParser:
     """Serialize the config object into a ConfigParser to write it out
     in the pmbootstrap_v3.cfg INI format.
 
@@ -91,7 +91,7 @@ def serialize(config: Config, skip_defaults=True) -> configparser.ConfigParser:
 
 
 # FIXME: we should have distinct Config and ConfigFile types
-def save(output: Path, config: Config):
+def save(output: Path, config: Config) -> None:
     """Save the config object to the specified path.
 
     IMPORTANT: The global config (available via get_context().config)

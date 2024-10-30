@@ -9,7 +9,7 @@ from pmb.meta import Cache
 
 
 @Cache(skip_extras=False)
-def pkgrepo_paths(skip_extras=False) -> list[Path]:
+def pkgrepo_paths(skip_extras: bool = False) -> list[Path]:
     config = get_context().config
     paths = list(map(lambda x: Path(x), config.aports))
     if not paths:
@@ -32,7 +32,7 @@ def pkgrepo_default_path() -> Path:
     return pkgrepo_paths(skip_extras=True)[0]
 
 
-def pkgrepo_names(skip_exras=False) -> list[str]:
+def pkgrepo_names(skip_exras: bool = False) -> list[str]:
     """
     Return a list of all the package repository names.
     """
@@ -78,7 +78,7 @@ def pkgrepo_glob_one(path: str) -> Path | None:
     return None
 
 
-def pkgrepo_iglob(path: str, recursive=False) -> Generator[Path, None, None]:
+def pkgrepo_iglob(path: str, recursive: bool = False) -> Generator[Path, None, None]:
     """
     Yield each matching glob over each aports repository.
     """
@@ -91,7 +91,7 @@ def pkgrepo_iglob(path: str, recursive=False) -> Generator[Path, None, None]:
             yield pdir
 
 
-def pkgrepo_iter_package_dirs(skip_extra_repos=False) -> Generator[Path, None, None]:
+def pkgrepo_iter_package_dirs(skip_extra_repos: bool = False) -> Generator[Path, None, None]:
     """
     Yield each matching glob over each aports repository.
     Detect duplicates within the same aports repository but otherwise

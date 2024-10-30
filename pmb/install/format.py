@@ -3,7 +3,7 @@
 from pmb.helpers import logging
 import pmb.chroot
 from pmb.core import Chroot
-from pmb.types import PmbArgs
+from pmb.types import PartitionLayout, PmbArgs, PathString
 
 
 def install_fsprogs(filesystem):
@@ -14,7 +14,7 @@ def install_fsprogs(filesystem):
     pmb.chroot.apk.install([fsprogs], Chroot.native())
 
 
-def format_and_mount_boot(args: PmbArgs, device, boot_label):
+def format_and_mount_boot(args: PmbArgs, device: str, boot_label: str) -> None:
     """
     :param device: boot partition on install block device (e.g. /dev/installp1)
     :param boot_label: label of the root partition (e.g. "pmOS_boot")
@@ -40,7 +40,7 @@ def format_and_mount_boot(args: PmbArgs, device, boot_label):
     pmb.chroot.root(["mount", device, mountpoint])
 
 
-def format_luks_root(args: PmbArgs, device):
+def format_luks_root(args: PmbArgs, device: str) -> None:
     """
     :param device: root partition on install block device (e.g. /dev/installp2)
     """
@@ -72,7 +72,7 @@ def format_luks_root(args: PmbArgs, device):
         raise RuntimeError("Failed to open cryptdevice!")
 
 
-def get_root_filesystem(args: PmbArgs):
+def get_root_filesystem(args: PmbArgs) -> str:
     ret = args.filesystem or pmb.parse.deviceinfo().root_filesystem or "ext4"
     pmaports_cfg = pmb.config.pmaports.read_config()
 
@@ -90,7 +90,7 @@ def get_root_filesystem(args: PmbArgs):
     return ret
 
 
-def prepare_btrfs_subvolumes(args: PmbArgs, device, mountpoint):
+def prepare_btrfs_subvolumes(args: PmbArgs, device: str, mountpoint: str) -> None:
     """
     Create separate subvolumes if root filesystem is btrfs.
     This lets us do snapshots and rollbacks of relevant parts
@@ -143,7 +143,9 @@ def prepare_btrfs_subvolumes(args: PmbArgs, device, mountpoint):
     pmb.chroot.root(["chattr", "+C", f"{mountpoint}/var"])
 
 
-def format_and_mount_root(args: PmbArgs, device, root_label, disk):
+def format_and_mount_root(
+    args: PmbArgs, device: str, root_label: str, disk: PathString | None
+) -> None:
     """
     :param device: root partition on install block device (e.g. /dev/installp2)
     :param root_label: label of the root partition (e.g. "pmOS_root")
@@ -185,7 +187,13 @@ def format_and_mount_root(args: PmbArgs, device, root_label, disk):
         prepare_btrfs_subvolumes(args, device, mountpoint)
 
 
-def format(args: PmbArgs, layout, boot_label, root_label, disk):
+def format(
+    args: PmbArgs,
+    layout: PartitionLayout,
+    boot_label: str,
+    root_label: str,
+    disk: PathString | None,
+) -> None:
     """
     :param layout: partition layout from get_partition_layout()
     :param boot_label: label of the boot partition (e.g. "pmOS_boot")

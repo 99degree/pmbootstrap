@@ -210,7 +210,7 @@ def ask_for_ui(deviceinfo: Deviceinfo) -> str:
         )
 
 
-def ask_for_ui_extras(config: Config, ui):
+def ask_for_ui_extras(config: Config, ui: str) -> bool:
     apkbuild = pmb.helpers.pmaports.get(
         f"postmarketos-ui-{ui}", subpackages=False, must_exist=False
     )
@@ -226,7 +226,7 @@ def ask_for_ui_extras(config: Config, ui):
     return pmb.helpers.cli.confirm("Enable this package?", default=config.ui_extras)
 
 
-def ask_for_systemd(config: Config, ui):
+def ask_for_systemd(config: Config, ui: str) -> SystemdConfig:
     if "systemd" not in pmb.config.pmaports.read_config_repos():
         return config.systemd
 
@@ -292,7 +292,7 @@ def ask_for_timezone() -> str:
     return "GMT"
 
 
-def ask_for_provider_select(apkbuild, providers_cfg) -> None:
+def ask_for_provider_select(apkbuild: dict[str, Any], providers_cfg: dict[str, str]) -> None:
     """Ask for selectable providers that are specified using "_pmb_select" in a APKBUILD.
 
     :param apkbuild: the APKBUILD with the _pmb_select

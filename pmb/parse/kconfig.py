@@ -11,6 +11,7 @@ import pmb.parse
 import pmb.helpers.pmaports
 import pmb.parse.kconfigcheck
 from pmb.helpers.exceptions import NonBugError
+from pmb.types import PathString
 
 
 def is_set(config, option):
@@ -158,7 +159,14 @@ def check_config_options_set(
     return ret
 
 
-def check_config(config_path, config_arch, pkgver, categories: list, details=False):
+# TODO: This should probably use Arch and not str for config_arch
+def check_config(
+    config_path: PathString,
+    config_arch: str,
+    pkgver: str,
+    categories: list[str],
+    details: bool = False,
+) -> bool:
     """
     Check, whether one kernel config passes the rules of multiple components.
 
@@ -295,7 +303,9 @@ def extract_version(config_path):
     return "unknown"
 
 
-def check_file(config_path, components_list: list[str] = [], details=False):
+def check_file(
+    config_path: PathString, components_list: list[str] = [], details: bool = False
+) -> bool:
     """
     Check for necessary kernel config options in a kconfig file.
 

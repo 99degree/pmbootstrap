@@ -60,7 +60,7 @@ def _parse_kernel_suffix(info, device, kernel):
 
 
 @Cache("device", "kernel")
-def deviceinfo(device=None, kernel=None) -> "Deviceinfo":
+def deviceinfo(device: str | None = None, kernel: str | None = None) -> "Deviceinfo":
     """
     :param device: defaults to args.device
     :param kernel: defaults to args.kernel
@@ -170,7 +170,7 @@ class Deviceinfo:
     keymaps: str | None = ""
 
     @staticmethod
-    def __validate(info: dict[str, str], path: Path):
+    def __validate(info: dict[str, str], path: Path) -> None:
         # Resolve path for more readable error messages
         path = path.resolve()
 

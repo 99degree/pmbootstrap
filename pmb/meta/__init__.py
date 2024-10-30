@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
-from typing import Generic, Optional, TypeVar, overload
+from typing import Any, Generic, Optional, TypeVar, overload
 from collections.abc import Callable
 
 import inspect
@@ -25,7 +25,7 @@ class Wrapper(Generic[FuncArgs, FuncReturn]):
     # actually end up here. We first check if we have a cached
     # result and if not then we do the actual function call and
     # cache it if applicable
-    def __call__(self, *args, **kwargs) -> FuncReturn:
+    def __call__(self, *args: Any, **kwargs: Any) -> FuncReturn:
         if self.disabled:
             return self.func(*args, **kwargs)
 
@@ -79,7 +79,7 @@ class Cache:
 
     # Build the cache key, or return None to not cache in the case where
     # we only cache when an argument has a specific value
-    def build_key(self, func: Callable, *args, **kwargs) -> str | None:
+    def build_key(self, func: Callable, *args: Any, **kwargs: Any) -> str | None:
         key = "~"
         # Easy case: cache irrelevant of arguments
         if not self.params and not self.kwargs:

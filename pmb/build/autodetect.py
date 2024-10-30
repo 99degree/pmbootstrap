@@ -3,7 +3,6 @@
 from pathlib import Path
 from pmb.core.arch import Arch
 from pmb.helpers import logging
-from typing import Any
 
 import pmb.config
 import pmb.chroot.apk
@@ -11,11 +10,11 @@ import pmb.helpers.pmaports
 from pmb.core import Chroot
 from pmb.core.context import get_context
 from pmb.meta import Cache
-from pmb.types import CrossCompileType
+from pmb.types import Apkbuild, CrossCompileType
 
 
 # FIXME (#2324): type hint Arch
-def arch_from_deviceinfo(pkgname, aport: Path) -> Arch | None:
+def arch_from_deviceinfo(pkgname: str, aport: Path) -> Arch | None:
     """
     The device- packages are noarch packages. But it only makes sense to build
     them for the device's architecture, which is specified in the deviceinfo
@@ -39,14 +38,14 @@ def arch_from_deviceinfo(pkgname, aport: Path) -> Arch | None:
 
 
 @Cache("package")
-def arch(package: str | dict[str, Any]):
+def arch(package: str | Apkbuild) -> Arch:
     """
     Find a good default in case the user did not specify for which architecture
     a package should be built.
 
     :param package: The name of the package or parsed APKBUILD
 
-    :returns: arch string like "x86_64" or "armhf". Preferred order, depending
+    :returns: Arch object. Preferred order, depending
               on what is supported by the APKBUILD:
               * native arch
               * device arch (this will be preferred instead if build_default_device_arch is true)
@@ -84,7 +83,7 @@ def arch(package: str | dict[str, Any]):
         return Arch.native()
 
 
-def chroot(apkbuild: dict[str, str], arch: Arch) -> Chroot:
+def chroot(apkbuild: Apkbuild, arch: Arch) -> Chroot:
     if arch == Arch.native():
         return Chroot.native()
 
@@ -94,7 +93,7 @@ def chroot(apkbuild: dict[str, str], arch: Arch) -> Chroot:
     return Chroot.buildroot(arch)
 
 
-def crosscompile(apkbuild, arch: Arch) -> CrossCompileType:
+def crosscompile(apkbuild: Apkbuild, arch: Arch) -> CrossCompileType:
     """Decide the type of compilation necessary to build a given APKBUILD."""
     if not get_context().cross:
         return None

@@ -8,12 +8,13 @@ import pmb.chroot
 import pmb.config
 import pmb.install.losetup
 from pmb.core import Chroot
+from pmb.types import PartitionLayout
 import pmb.core.dps
 
 
 # FIXME (#2324): this function drops disk to a string because it's easier
 # to manipulate, this is probably bad.
-def partitions_mount(device: str, layout, disk: Path | None):
+def partitions_mount(device: str, layout: PartitionLayout, disk: Path | None) -> None:
     """
     Mount blockdevices of partitions inside native chroot
     :param layout: partition layout from get_partition_layout()
@@ -61,7 +62,7 @@ def partitions_mount(device: str, layout, disk: Path | None):
         pmb.helpers.mount.bind_file(source, target)
 
 
-def partition(layout, size_boot, size_reserve):
+def partition(layout: PartitionLayout, size_boot: int, size_reserve: int) -> None:
     """
     Partition /dev/install and create /dev/install{p1,p2,p3}:
     * /dev/installp1: boot
@@ -122,7 +123,7 @@ def partition(layout, size_boot, size_reserve):
         pmb.chroot.root(["parted", "-s", "/dev/install"] + command, check=False)
 
 
-def partition_cgpt(layout, size_boot, size_reserve):
+def partition_cgpt(layout: PartitionLayout, size_boot: int, size_reserve: int) -> None:
     """
     This function does similar functionality to partition(), but this
     one is for ChromeOS devices which use special GPT. We don't follow

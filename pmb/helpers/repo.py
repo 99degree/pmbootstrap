@@ -54,7 +54,7 @@ def apkindex_hash(url: str, length: int = 8) -> Path:
 # FIXME: make config.mirrors a normal dict
 # mypy: disable-error-code="literal-required"
 @Cache("user_repository", "mirrors_exclude")
-def urls(user_repository=False, mirrors_exclude: list[str] = []):
+def urls(user_repository: bool = False, mirrors_exclude: list[str] = []) -> list[str]:
     """Get a list of repository URLs, as they are in /etc/apk/repositories.
 
     :param user_repository: add /mnt/pmbootstrap/packages
@@ -118,7 +118,7 @@ def urls(user_repository=False, mirrors_exclude: list[str] = []):
 
 
 def apkindex_files(
-    arch: Arch | None = None, user_repository=True, exclude_mirrors: list[str] = []
+    arch: Arch | None = None, user_repository: bool = True, exclude_mirrors: list[str] = []
 ) -> list[Path]:
     """Get a list of outside paths to all resolved APKINDEX.tar.gz files for a specific arch.
 
@@ -144,7 +144,7 @@ def apkindex_files(
 
 
 @Cache("arch", force=False)
-def update(arch: Arch | None = None, force=False, existing_only=False):
+def update(arch: Arch | None = None, force: bool = False, existing_only: bool = False) -> bool:
     """Download the APKINDEX files for all URLs depending on the architectures.
 
     :param arch: * one Alpine architecture name ("x86_64", "armhf", ...)
@@ -223,7 +223,7 @@ def update(arch: Arch | None = None, force=False, existing_only=False):
     return True
 
 
-def alpine_apkindex_path(repo="main", arch: Arch | None = None):
+def alpine_apkindex_path(repo: str = "main", arch: Arch | None = None) -> Path:
     """Get the path to a specific Alpine APKINDEX file on disk and download it if necessary.
 
     :param repo: Alpine repository name (e.g. "main")
