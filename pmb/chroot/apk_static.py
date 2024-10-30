@@ -25,7 +25,7 @@ def read_signature_info(tar):
     :returns: (sigfilename, sigkey_path)
     """
     # Get signature filename and key
-    prefix = "sbin/apk.static.SIGN.RSA."
+    prefix = "sbin/apk.static.SIGN.RSA.sha256."
     sigfilename = None
     for filename in tar.getnames():
         if filename.startswith(prefix):
@@ -85,7 +85,7 @@ def verify_signature(args, files, sigkey_path):
     """
     logging.debug(f"Verify apk.static signature with {sigkey_path}")
     try:
-        pmb.helpers.run.user(args, ["openssl", "dgst", "-sha1", "-verify",
+        pmb.helpers.run.user(args, ["openssl", "dgst", "-sha256", "-verify",
                                     sigkey_path, "-signature", files[
                                         "sig"]["temp_path"],
                                     files["apk"]["temp_path"]])

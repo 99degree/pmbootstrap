@@ -44,9 +44,9 @@ def test_read_signature_info(args):
     # Signature file with invalid name
     pmb.chroot.user(args, ["mkdir", "-p", tmp_path + "/sbin"])
     pmb.chroot.user(args, ["cp", "/etc/issue", tmp_path +
-                           "/sbin/apk.static.SIGN.RSA.invalid.pub"])
+                           "/sbin/apk.static.SIGN.RSA.sha256.invalid.pub"])
     pmb.chroot.user(args, ["tar", "-czf", tmp_path + "/invalid_sig.apk",
-                           "sbin/apk.static.SIGN.RSA.invalid.pub"],
+                           "sbin/apk.static.SIGN.RSA.sha256.invalid.pub"],
                     working_dir=tmp_path)
     with tarfile.open(tmp_path_outside + "/invalid_sig.apk", "r:gz") as tar:
         with pytest.raises(RuntimeError) as e:
@@ -56,9 +56,9 @@ def test_read_signature_info(args):
     # Signature file with realistic name
     path = glob.glob(pmb.config.apk_keys_path + "/*.pub")[0]
     name = os.path.basename(path)
-    path_archive = "sbin/apk.static.SIGN.RSA." + name
+    path_archive = "sbin/apk.static.SIGN.RSA.sha256." + name
     pmb.chroot.user(args, ["mv",
-                           f"{tmp_path}/sbin/apk.static.SIGN.RSA.invalid.pub",
+                           f"{tmp_path}/sbin/apk.static.SIGN.RSA.sha256.invalid.pub",
                            f"{tmp_path}/{path_archive}"])
     pmb.chroot.user(args, ["tar", "-czf", tmp_path + "/realistic_name_sig.apk",
                            path_archive], working_dir=tmp_path)
