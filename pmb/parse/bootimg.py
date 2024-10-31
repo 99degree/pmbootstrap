@@ -192,8 +192,8 @@ def bootimg(path: Path) -> Bootimg:
         tags_offset=output["tags_offset"],
         pagesize=output["pagesize"],
         header_version=output.get("header_version"),
-        mtk_label_kernel=output["mtk_label_kernel"],
-        mtk_label_ramdisk=output["mtk_label_ramdisk"],
+        mtk_label_kernel=output.get("mtk_label_kernel", ""),
+        mtk_label_ramdisk=output.get("mtk_label_ramdisk", ""),
     )
 
 
