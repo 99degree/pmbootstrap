@@ -77,6 +77,59 @@ To extract the generated initramfs:
    $ pmbootstrap initfs extract
 
 
+Build and flash Android recovery zip:
+
+.. code-block:: shell
+
+ $ pmbootstrap install --android-recovery-zip
+ $ pmbootstrap flasher --method=adb sideload
+
+
+Update existing installation on SD card:
+
+.. code-block:: shell
+
+ $ pmbootstrap install --disk=/dev/mmcblk0 --rsync
+
+
+Run the image in QEMU:
+
+.. code-block:: shell
+
+ $ pmbootstrap qemu --image-size=1G
+
+
+Update existing installation on SD card:
+
+.. code-block:: shell
+
+ $ pmbootstrap install --disk=/dev/mmcblk0 --rsync
+
+
+
+**Device Porting Assistance**
+
+Analyze Android boot.img files (also works with recovery OS images like TWRP):
+
+.. code-block:: shell
+
+ $ pmbootstrap bootimg_analyze ~/Downloads/twrp-3.2.1-0-fp2.img
+
+
+Check kernel configs:
+
+.. code-block:: shell
+
+ $ pmbootstrap kconfig check
+
+
+Edit a kernel config:
+
+.. code-block:: shell
+ 
+ $ pmbootstrap kconfig edit --arch=armhf postmarketos-mainline
+
+
 
 For further details on the different actions please see below and refer to the wiki-arcticle on `pmbootstrap`_.
 
