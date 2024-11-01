@@ -2,6 +2,14 @@
 Debugging
 #########
 
+pmbootstrap writes all log output and each shell command it runs to log.txt inside the work dir.
+Use the following command to follow the log in a second terminal: 
+
+.. code-block:: shell
+
+  $ pmbootstrap log
+
+
 Use ``-v`` on any action to get verbose logging:
 
 .. code-block:: shell
