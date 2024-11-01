@@ -2,7 +2,7 @@
 Debugging
 #########
 
-Use -v on any action to get verbose logging:
+Use ``-v`` on any action to get verbose logging:
 
 .. code-block:: shell
 
@@ -12,6 +12,7 @@ Use -v on any action to get verbose logging:
 Parse a single deviceinfo and return it as JSON:
 
 .. code-block:: shell
+
   $ pmbootstrap deviceinfo_parse pine64-pinephone
 
 
@@ -29,7 +30,7 @@ Parse a package from an APKINDEX and return it as JSON:
   $ pmbootstrap apkindex_parse $WORK/cache_apk_x86_64/APKINDEX.8b865e19.tar.gz hello-world
 
 
-ccache statistics:
+``ccache`` statistics:
 
 .. code-block:: shell
 
