@@ -108,6 +108,9 @@ def init(chroot: Chroot = Chroot.native()) -> bool:
         ["sed", "-i", "-e", "s/^ERROR_CLEANUP=.*/ERROR_CLEANUP=''/", "/etc/abuild.conf"], chroot
     )
 
+    # abuild.conf: use the fastest compression possible
+    pmb.chroot.root(["sed", "-i", "-e", "s/#COMPRESS=.*/COMPRESS=1/", "/etc/abuild.conf"], chroot)
+
     pathlib.Path(marker).touch()
     return True
 
