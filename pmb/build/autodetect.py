@@ -87,8 +87,8 @@ def chroot(apkbuild: Apkbuild, arch: Arch) -> Chroot:
     if arch == Arch.native():
         return Chroot.native()
 
-    if "pmb:cross-native" in apkbuild["options"]:
-        return Chroot.native()
+    # if "pmb:cross-native" in apkbuild["options"]:
+    #     return Chroot.native()
 
     return Chroot.buildroot(arch)
 

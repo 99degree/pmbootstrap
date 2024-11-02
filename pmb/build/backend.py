@@ -190,7 +190,7 @@ def run_abuild(
     strict: bool = False,
     force: bool = False,
     cross: CrossCompileType = None,
-    suffix: Chroot = Chroot.native(),
+    hostchroot: Chroot = Chroot.native(),
     src: str | None = None,
     bootstrap_stage: int = BootstrapStage.NONE,
 ) -> None:
@@ -214,6 +214,16 @@ def run_abuild(
             " cross-compiling in the native chroot. This will"
             " probably fail!"
         )
+
+    # For cross-native compilation, bindmount the "host" rootfs to /mnt/sysroot
+    # it will be used as the "sysroot"
+    if cross == "native":
+        # pmb.helpers.mount.umount_all(buildchroot.path)
+        pmb.mount.bind(hostchroot.path, Chroot.native() / "/mnt/sysroot", umount=True)
+
+    # FIXME: depend on cross to set this
+    chroot = Chroot.native() if cross == "native" else hostchroot
+
     pkgdir = context.config.work / "packages" / channel
     if not pkgdir.exists():
         pmb.helpers.run.root(["mkdir", "-p", pkgdir])
@@ -232,17 +242,24 @@ def run_abuild(
             ["rm", "-f", "/home/pmos/packages/pmos"],
             ["ln", "-sf", f"/mnt/pmbootstrap/packages/{channel}", "/home/pmos/packages/pmos"],
         ],
-        suffix,
+        chroot,
     )
 
     # Environment variables
-    env: Env = {"CARCH": str(arch), "SUDO_APK": "abuild-apk --no-progress"}
+    env: Env = {"SUDO_APK": "abuild-apk --no-progress"}
     if cross == "native":
-        hostspec = arch.alpine_triple()
-        env["CROSS_COMPILE"] = hostspec + "-"
-        env["CC"] = hostspec + "-gcc"
-    if cross == "crossdirect":
+        # FIXME: figure out how to build kernels again...
+        # hostspec = arch.alpine_triple()
+        # env["CROSS_COMPILE"] = hostspec + "-"
+        # env["CC"] = hostspec + "-gcc"
+        env["CHOST"] = str(arch)
+        env["CBUILDROOT"] = "/mnt/sysroot"
+        env["CFLAGS"] = "-Wl,-rpath-link=/mnt/sysroot/usr/lib -I/mnt/sysroot/usr/include"
+        # env["PKG_CONFIG_SYSROOT_DIR"] = "/mnt/sysroot/usr"
+    elif cross == "crossdirect":
         env["PATH"] = ":".join([f"/native/usr/lib/crossdirect/{arch}", pmb.config.chroot_path])
+    else:
+        env["CARCH"] = str(arch)
     if not context.ccache:
         env["CCACHE_DISABLE"] = "1"
 
@@ -264,6 +281,9 @@ def run_abuild(
 
     if bootstrap_stage:
         env["BOOTSTRAP"] = str(bootstrap_stage)
+    else:
+        # FIXME: otherwise abuild tries to install build-base-aarch64 or w/e
+        env["BOOTSTRAP"] = "no"
 
     # Build the abuild command
     cmd = ["abuild", "-D", "postmarketOS"]
@@ -283,14 +303,16 @@ def run_abuild(
         cmd += ["-K"]
 
     # Copy the aport to the chroot and build it
-    pmb.build.copy_to_buildpath(apkbuild["pkgname"], suffix, no_override=strict)
+    pmb.build.copy_to_buildpath(apkbuild["pkgname"], chroot, no_override=strict)
     if src and strict:
-        logging.debug(f"({suffix}) Ensuring previous build artifacts are removed")
-        pmb.chroot.root(["rm", "-rf", "/tmp/pmbootstrap-local-source-copy"], suffix)
-    override_source(apkbuild, pkgver, src, suffix)
-    link_to_git_dir(suffix)
+        logging.debug(f"({chroot}) Ensuring previous build artifacts are removed")
+        pmb.chroot.root(["rm", "-rf", "/tmp/pmbootstrap-local-source-copy"], chroot)
+    override_source(apkbuild, pkgver, src, chroot)
+    link_to_git_dir(chroot)
 
     try:
-        pmb.chroot.user(cmd, suffix, Path("/home/pmos/build"), env=env)
+        pmb.chroot.user(cmd, chroot, Path("/home/pmos/build"), env=env)
     finally:
-        handle_csum_failure(apkbuild, suffix)
+        handle_csum_failure(apkbuild, chroot)
+
+    pmb.helpers.run.root(["umount", Chroot.native() / "/mnt/sysroot"], output="null", check=False)
