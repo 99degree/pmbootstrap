@@ -115,6 +115,11 @@ deploy:
     paths: [packages]
     expire_in: 1 week
 
+analyze bootimg:
+  extends: .integration
+  script:
+    - .ci/integration_tests/analyze_bootimg
+
 # Test that we can generate an install rootfs on AMD64 for native
 # and arm64 QEMU targets
 install amd64:

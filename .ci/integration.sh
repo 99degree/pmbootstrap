@@ -29,6 +29,11 @@ pmbootstrap -q shutdown
 # Default for tests where the device doesn't matter
 pmbootstrap config device qemu-amd64
 
+# Tests the bootimg analysis functionality.
+analyze_bootimg() {
+	pmbootstrap bootimg_analyze test/data/htc-primou-boot.img
+}
+
 # A test that builds normal and FDE images for the given device/ui
 build_images() {
 	device="$1"
