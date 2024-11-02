@@ -29,7 +29,7 @@ Quick health check and config overview:
 After successfully finishing the ``init`` sequence with answering all questions, its time to build the 
 installation:
 
-Devices like the PinePhone, Samsung Galaxy S II, Nokia N900, various laptops etc. boot from an SD card, USB stick or other external storage. Find the name with lsblk first and make sure it is the right one as you will overwrite everything on it. Use a path without partition number at the end, such as /dev/mmcblk0. If your device is able to boot from SD card without flashing anything (such as the PinePhone), you should then be able to insert SD card into your device and boot it up.
+Devices like the PinePhone, Samsung Galaxy S II, Nokia N900, various laptops etc. can boot from an SD card, USB stick or other external storage. Find the name with lsblk first and make sure it is the right one as you will overwrite everything on it. Use a path without partition number at the end, such as /dev/mmcblk0. If your device is able to boot from SD card without flashing anything (such as the PinePhone), you should then be able to insert SD card into your device and boot it up.
 
 .. code-block:: shell
 
