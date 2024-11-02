@@ -16,6 +16,7 @@ from pmb.core.arch import Arch
 from pmb.core.pkgrepo import pkgrepo_names
 from pmb.helpers import logging
 from pathlib import Path
+from typing import Literal
 
 import pmb.config.pmaports
 from pmb.meta import Cache
@@ -54,11 +55,14 @@ def apkindex_hash(url: str, length: int = 8) -> Path:
 # FIXME: make config.mirrors a normal dict
 # mypy: disable-error-code="literal-required"
 @Cache("user_repository", "mirrors_exclude")
-def urls(user_repository: bool = False, mirrors_exclude: list[str] = []) -> list[str]:
+def urls(
+    user_repository: Path | None = None, mirrors_exclude: list[str] | Literal[True] = []
+) -> list[str]:
     """Get a list of repository URLs, as they are in /etc/apk/repositories.
 
     :param user_repository: add /mnt/pmbootstrap/packages
-    :param mirrors_exclude: mirrors to exclude (see pmb.core.config.Mirrors)
+    :param mirrors_exclude: mirrors to exclude (see pmb.core.config.Mirrors) or true to exclude
+                            all mirrors and only return the local repos
     :returns: list of mirror strings, like ["/mnt/pmbootstrap/packages",
                                             "http://...", ...]
     """
@@ -74,7 +78,10 @@ def urls(user_repository: bool = False, mirrors_exclude: list[str] = []) -> list
     # Local user repository (for packages compiled with pmbootstrap)
     if user_repository:
         for channel in pmb.config.pmaports.all_channels():
-            ret.append(f"/mnt/pmbootstrap/packages/{channel}")
+            ret.append(str(user_repository / channel))
+
+    if mirrors_exclude is True:
+        return ret
 
     # Don't add the systemd mirror if systemd is disabled
     if not pmb.config.is_systemd_selected(config):

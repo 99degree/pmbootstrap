@@ -4,7 +4,6 @@ from pathlib import Path
 import pmb.aportgen.core
 import pmb.build
 import pmb.chroot.apk
-import pmb.chroot.apk_static
 from pmb.core.arch import Arch
 import pmb.helpers.run
 import pmb.parse.apkindex

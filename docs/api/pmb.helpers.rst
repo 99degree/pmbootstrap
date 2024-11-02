@@ -4,6 +4,14 @@ pmb.helpers package
 Submodules
 ----------
 
+pmb.helpers.apk\_static module
+-----------------------------
+
+.. automodule:: pmb.helpers.apk_static
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pmb.helpers.apk module
 ----------------------
 

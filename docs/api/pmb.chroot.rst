@@ -12,14 +12,6 @@ pmb.chroot.apk module
    :undoc-members:
    :show-inheritance:
 
-pmb.chroot.apk\_static module
------------------------------
-
-.. automodule:: pmb.chroot.apk_static
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pmb.chroot.binfmt module
 ------------------------
 

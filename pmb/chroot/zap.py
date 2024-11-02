@@ -11,6 +11,7 @@ import pmb.config.workdir
 import pmb.chroot
 import pmb.config.pmaports
 import pmb.config.workdir
+import pmb.helpers.apk
 import pmb.helpers.cli
 import pmb.helpers.pmaports
 import pmb.helpers.run
@@ -107,7 +108,7 @@ def zap(
     pmb.config.workdir.clean()
 
     # Chroots were zapped, so no repo lists exist anymore
-    pmb.chroot.apk.update_repository_list.cache_clear()
+    pmb.helpers.apk.update_repository_list.cache_clear()
     # Let chroot.init be called again
     pmb.chroot.init.cache_clear()
 
@@ -183,18 +184,6 @@ def zap_pkgs_online_mismatch(confirm=True, dry=False):
     # Iterate over existing apk caches
     for path in paths:
         arch = Arch.from_str(path.name.split("_", 2)[2])
-        if arch.is_native():
-            chroot = Chroot.native()
-        else:
-            chroot = Chroot.buildroot(arch)
 
-        # Skip if chroot does not exist
-        # FIXME: should we init the buildroot to do it anyway?
-        # what if we run apk.static with --arch instead?
-        if not chroot.exists():
-            continue
-
-        # Clean the cache with apk
-        logging.info(f"({chroot}) apk -v cache clean")
         if not dry:
-            pmb.chroot.root(["apk", "-v", "cache", "clean"], chroot)
+            pmb.helpers.apk.cache_clean(arch)

@@ -4,7 +4,6 @@ from pathlib import Path
 import pmb.aportgen.core
 import pmb.build
 import pmb.chroot.apk
-import pmb.chroot.apk_static
 import pmb.helpers.run
 import pmb.parse.apkindex
 from pmb.core import Chroot

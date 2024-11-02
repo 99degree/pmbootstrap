@@ -51,7 +51,7 @@ def delete(hook: str, suffix: Chroot) -> None:
     if hook not in list_chroot(suffix):
         raise RuntimeError("There is no such hook installed!")
     prefix = pmb.config.initfs_hook_prefix
-    pmb.chroot.root(["apk", "del", f"{prefix}{hook}"], suffix)
+    pmb.helpers.apk.run(["del", f"{prefix}{hook}"], suffix)
 
 
 def update(suffix: Chroot) -> None:

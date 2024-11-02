@@ -211,7 +211,7 @@ def chroot(args: PmbArgs) -> None:
         size_reserve = 2048  # 2 GiB
         pmb.install.blockdevice.create_and_mount_image(args, size_boot, size_root, size_reserve)
 
-    pmb.chroot.apk.update_repository_list(chroot, user_repository=True)
+    pmb.helpers.apk.update_repository_list(chroot.path, user_repository=True)
 
     # TODO: Maybe this could be done better.
     output_type = cast(RunOutputType, args.output)
@@ -460,19 +460,6 @@ def newapkbuild(args: PmbArgs) -> None:
     # Passthrough: PKGNAME[-PKGVER] | SRCURL
     pass_through.append(args.pkgname_pkgver_srcurl)
     pmb.build.newapkbuild(args.folder, pass_through, get_context().force)
-
-
-def deviceinfo_parse(args: PmbArgs) -> None:
-    # Default to all devices
-    devices = args.devices
-    if not devices:
-        devices = pmb.helpers.devices.list_codenames()
-
-    # Iterate over all devices
-    kernel = args.deviceinfo_parse_kernel
-    for device in devices:
-        print(f"{device}, with kernel={kernel}:")
-        print(json.dumps(pmb.parse.deviceinfo(device, kernel), indent=4, sort_keys=True))
 
 
 def apkbuild_parse(args: PmbArgs) -> None:
