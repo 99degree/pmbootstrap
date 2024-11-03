@@ -99,14 +99,6 @@ Run the image in QEMU:
  $ pmbootstrap qemu --image-size=1G
 
 
-Update existing installation on SD card:
-
-.. code-block:: shell
-
- $ pmbootstrap install --disk=/dev/mmcblk0 --rsync
-
-
-
 **Device Porting Assistance**
 
 Analyze Android boot.img files (also works with recovery OS images like TWRP):
