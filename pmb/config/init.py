@@ -37,7 +37,9 @@ import pmb.parse._apkbuild
 def require_programs() -> None:
     missing = []
     for program in pmb.config.required_programs:
-        if not shutil.which(program):
+        # Debian: some programs are in /usr/sbin, which is not in PATH
+        # unless using sudo
+        if not shutil.which(program) and not os.path.exists(os.path.join("/usr/sbin", program)):
             missing.append(program)
 
     losetup_missing_json = False
