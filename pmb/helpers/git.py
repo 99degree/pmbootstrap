@@ -5,7 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Final
 from pmb.core.context import get_context
-from pmb.core.pkgrepo import pkgrepo_default_path, pkgrepo_path
+from pmb.core.pkgrepo import pkgrepo_default_path, pkgrepo_path, pkgrepo_name
 from pmb.helpers import logging
 import os
 import re
@@ -107,7 +107,10 @@ def get_upstream_remote(aports: Path) -> str:
 
     Usually "origin", but the user may have set up their git repository differently.
     """
-    name_repo = aports.parts[-1]
+    name_repo = pkgrepo_name(aports)
+    if name_repo not in pmb.config.git_repos:
+        logging.warning(f"WARNING: can't determine remote for {name_repo}, using 'origin'")
+        return "origin"
     urls = pmb.config.git_repos[name_repo]
     lines = list_remotes(aports)
     for line in lines:

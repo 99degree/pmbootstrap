@@ -886,6 +886,7 @@ def get_parser():
     parser.add_argument(
         "-w",
         "--work",
+        type=lambda x: Path(x).absolute(),
         help="folder where all data gets stored (chroots, caches, built packages)",
     )
     parser.add_argument(

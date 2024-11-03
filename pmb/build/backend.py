@@ -1,6 +1,6 @@
 import enum
 from pathlib import Path
-from pmb.core.pkgrepo import pkgrepo_paths
+from pmb.core.pkgrepo import pkgrepo_name, pkgrepo_paths
 import pmb.helpers.run
 import pmb.chroot
 
@@ -126,10 +126,10 @@ def mount_pmaports(chroot: Chroot = Chroot.native()) -> dict[str, Path]:
     """
     dest_paths = {}
     for repo in pkgrepo_paths(skip_extras=True):
-        destination = Path("/mnt") / repo.name
+        destination = Path("/mnt") / pkgrepo_name(repo)
         outside_destination = chroot / destination
         pmb.helpers.mount.bind(repo, outside_destination, umount=True)
-        dest_paths[repo.name] = destination
+        dest_paths[pkgrepo_name(repo)] = destination
 
     return dest_paths
 

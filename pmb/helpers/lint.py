@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from collections.abc import Sequence
 from pmb.core.chroot import Chroot
-from pmb.core.pkgrepo import pkgrepo_iter_package_dirs, pkgrepo_names, pkgrepo_relative_path
+from pmb.core.pkgrepo import (
+    pkgrepo_iter_package_dirs,
+    pkgrepo_name,
+    pkgrepo_names,
+    pkgrepo_relative_path,
+)
 from pmb.helpers import logging
 from pmb.helpers.exceptions import NonBugError
 from pmb.helpers.toml import load_toml_file
@@ -69,7 +74,7 @@ def check(pkgnames: Sequence[str]) -> None:
             continue
 
         repo, relpath = pkgrepo_relative_path(pkgdir)
-        apkbuilds[repo.name].append(os.fspath(relpath / "APKBUILD"))
+        apkbuilds[pkgrepo_name(repo)].append(os.fspath(relpath / "APKBUILD"))
         found_pkgnames.add(pkgdir.name)
 
     # Check we found all the packages in pkgnames
@@ -94,7 +99,7 @@ def check(pkgnames: Sequence[str]) -> None:
             ["apkbuild-lint"] + apkbuild_paths,
             check=False,
             output="stdout",
-            working_dir=dest_paths[repo.name],
+            working_dir=dest_paths[pkgrepo_name(repo)],
             env={"CUSTOM_VALID_OPTIONS": " ".join(get_custom_valid_options())},
         ):
             has_failed = True
