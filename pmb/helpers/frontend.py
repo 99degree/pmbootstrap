@@ -260,17 +260,17 @@ def config(args: PmbArgs) -> None:
             value = ""
 
         def to_shell_friendly_representation(value: Any) -> str:
-            friendly_representation: str
+            def shell_format(inner_value: Any) -> str:
+                if isinstance(inner_value, Path):
+                    return inner_value.as_posix()
+                else:
+                    return str(inner_value)
 
-            if isinstance(value, list) and len(value) == 1:
-                value = value[0]
-
-            if isinstance(value, Path):
-                friendly_representation = value.as_posix()
+            if isinstance(value, list):
+                # Ensure that paths are quoted so they can include spaces.
+                return f'"{'" "'.join(shell_format(item) for item in value)}"'
             else:
-                friendly_representation = str(value)
-
-            return friendly_representation
+                return f'"{shell_format(value)}"'
 
         print(to_shell_friendly_representation(value))
     else:
