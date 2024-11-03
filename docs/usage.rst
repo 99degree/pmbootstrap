@@ -127,7 +127,7 @@ Edit a kernel config:
 
 .. code-block:: shell
  
- $ pmbootstrap kconfig edit --arch=armhf postmarketos-mainline
+ $ pmbootstrap kconfig edit
 
 
 
