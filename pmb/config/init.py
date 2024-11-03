@@ -83,7 +83,7 @@ def ask_for_username(default_user: str) -> str:
         return ret
 
 
-def ask_for_work_path(args: PmbArgs) -> tuple[Path, bool]:
+def ask_for_work_path(default: Path | None) -> tuple[Path, bool]:
     """Ask for the work path, until we can create it (when it does not exist) and write into it.
 
     :returns: (path, exists)
@@ -98,9 +98,7 @@ def ask_for_work_path(args: PmbArgs) -> tuple[Path, bool]:
     )
     while True:
         try:
-            work = os.path.expanduser(
-                pmb.helpers.cli.ask("Work path", None, get_context().config.work, False)
-            )
+            work = os.path.expanduser(pmb.helpers.cli.ask("Work path", None, default, False))
             work = os.path.realpath(work)
             exists = os.path.exists(work)
 
@@ -697,15 +695,15 @@ def frontend(args: PmbArgs) -> None:
     require_programs()
 
     # Work folder (needs to be first, so we can create chroots early)
-    config = pmb.config.load(args.config)
-    # Update context to point to new config
-    get_context().config = config
+    config = get_context().config
 
-    config.work, work_exists = ask_for_work_path(args)
+    using_default_pmaports = config.aports[-1].is_relative_to(config.work)
 
-    # If the work dir is not the default, reset aports and make
-    # it relative to the work dir
-    if not config.aports[0].is_relative_to(config.work):
+    config.work, work_exists = ask_for_work_path(config.work)
+
+    # If the work dir changed then we need to update the pmaports path
+    # to be relative to the new workdir
+    if using_default_pmaports:
         config.aports = [config.work / "cache_git/pmaports"]
 
     # Update args and save config (so chroots and 'pmbootstrap log' work)

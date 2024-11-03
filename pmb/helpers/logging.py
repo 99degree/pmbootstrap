@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 import sys
 from typing import Any, Final, TextIO
-import pmb.config
 from pmb.meta import Cache
 
 logfd: TextIO
@@ -29,6 +28,12 @@ class log_handler(logging.StreamHandler):
         self.details_to_stdout = details_to_stdout
         self.quiet = False
 
+        # FIXME: importing pmb.config pulls in a whole lot of stuff
+        # and can easily lead to circular imports, so we defer it until here.
+        import pmb.config
+
+        self.styles = pmb.config.styles
+
     def emit(self, record):
         try:
             msg = self.format(record)
@@ -37,7 +42,7 @@ class log_handler(logging.StreamHandler):
             if self.details_to_stdout or (not self.quiet and record.levelno >= logging.INFO):
                 stream = self.stream
 
-                styles = pmb.config.styles
+                styles = self.styles
 
                 msg_col = (
                     msg.replace(
@@ -147,7 +152,6 @@ def init(logfile: Path, verbose: bool, details_to_stdout: bool = False) -> None:
     handler.setFormatter(formatter)
     root_logger.addHandler(handler)
 
-    logging.debug(f"Pmbootstrap v{pmb.__version__} (Python {sys.version})")
     if "--password" in sys.argv:
         sys.argv[sys.argv.index("--password") + 1] = "[REDACTED]"
     logging.debug(f"$ pmbootstrap {' '.join(sys.argv)}")

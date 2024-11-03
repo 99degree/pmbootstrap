@@ -28,21 +28,42 @@ def pkgrepo_paths(skip_extras: bool = False) -> list[Path]:
     return out_paths
 
 
+@Cache()
 def pkgrepo_default_path() -> Path:
     return pkgrepo_paths(skip_extras=True)[0]
 
 
 def pkgrepo_names(skip_exras: bool = False) -> list[str]:
     """
-    Return a list of all the package repository names.
+    Return a list of all the package repository names. We REQUIRE
+    that the last repository is "pmaports", though the directory
+    may be named differently. So we hardcode the name here.
     """
-    return [aports.name for aports in pkgrepo_paths(skip_exras)]
+    names = [aports.name for aports in pkgrepo_paths(skip_exras)]
+    names[-1] = "pmaports"
+    return names
+
+
+def pkgrepo_name(path: Path) -> str:
+    """
+    Return the name of the package repository with the given path. This
+    MUST be used instead of "path.name" as we need special handling
+    for the pmaports repository.
+    """
+    if path == get_context().config.aports[-1]:
+        return "pmaports"
+
+    return path.name
 
 
 def pkgrepo_path(name: str) -> Path:
     """
     Return the absolute path to the package repository with the given name.
     """
+    # The pmaports repo is always last, and we hardcode the name.
+    if name == "pmaports":
+        return get_context().config.aports[-1]
+
     for aports in pkgrepo_paths():
         if aports.name == name:
             return aports
@@ -56,7 +77,7 @@ def pkgrepo_name_from_subdir(subdir: Path) -> str:
     """
     for aports in pkgrepo_paths():
         if subdir.is_relative_to(aports):
-            return aports.name
+            return pkgrepo_name(aports)
     raise RuntimeError(f"aports subdir '{subdir}' not found")
 
 
@@ -105,14 +126,14 @@ def pkgrepo_iter_package_dirs(skip_extra_repos: bool = False) -> Generator[Path,
             if "extra-repos" not in repo.parts and "extra-repos" in pdir.parts:
                 continue
             pkg = os.path.basename(pdir)
-            if pkg in seen[repo.name]:
+            if pkg in seen[pkgrepo_name(repo)]:
                 raise RuntimeError(
                     f"Package {pkg} found in multiple aports "
                     "subfolders. Please put it only in one folder."
                 )
             if pkg in [x for li in seen.values() for x in li]:
                 continue
-            seen[repo.name].append(pkg)
+            seen[pkgrepo_name(repo)].append(pkg)
             yield pdir
 
 

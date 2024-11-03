@@ -3,7 +3,6 @@
 import os
 from pathlib import Path
 import subprocess
-from pmb.core.arch import Arch
 import pmb.helpers.run_core
 from collections.abc import Sequence
 from typing import overload, Literal
@@ -35,13 +34,8 @@ def user(
     See pmb.helpers.run_core.core() for a detailed description of all other
     arguments and the return value.
     """
-    cmd_parts = []
-    for c in cmd:
-        if isinstance(c, Arch):
-            c = str(c)
-        else:
-            c = os.fspath(c)
-        cmd_parts.append(c)
+    cmd_parts = [os.fspath(c) for c in cmd]
+
     # Readable log message (without all the escaping)
     msg = "% "
     for key, value in env.items():

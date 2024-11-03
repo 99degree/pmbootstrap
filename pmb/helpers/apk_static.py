@@ -161,7 +161,8 @@ def init() -> None:
     """
     Download, verify, extract $WORK/apk.static.
     """
-    # Get and parse the APKINDEX
+    # Get and parse the APKINDEX. alpine_apkindex_path() will implicitly
+    # download the APKINDEX file if it's missing.
     apkindex = pmb.helpers.repo.alpine_apkindex_path("main")
     index_data = pmb.parse.apkindex.package("apk-tools-static", indexes=[apkindex])
 
@@ -177,13 +178,3 @@ def init() -> None:
     apk_name = f"apk-tools-static-{version}.apk"
     apk_static = download(apk_name)
     extract(version, apk_static)
-
-
-def run(parameters):
-    # --no-interactive is a parameter to `add`, so it must be appended or apk
-    # gets confused
-    parameters += ["--no-interactive"]
-
-    if get_context().offline:
-        parameters = ["--no-network"] + parameters
-    pmb.helpers.apk.apk_with_progress(parameters)

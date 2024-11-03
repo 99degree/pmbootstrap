@@ -14,6 +14,7 @@ from collections.abc import Sequence
 from pmb.config.file import load, save, serialize
 from pmb.config.sudo import which_sudo
 from pmb.config.other import is_systemd_selected
+from . import workdir
 
 
 #

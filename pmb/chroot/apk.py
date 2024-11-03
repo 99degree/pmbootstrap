@@ -6,10 +6,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import traceback
-import pmb.chroot.apk_static
 from pmb.core.arch import Arch
 from pmb.helpers import logging
-import shlex
 from collections.abc import Sequence
 
 import pmb.build
@@ -28,57 +26,6 @@ from pmb.core import Chroot
 from pmb.core.context import get_context
 from pmb.types import PathString
 from pmb.helpers.exceptions import NonBugError
-
-
-@Cache("chroot", "user_repository", mirrors_exclude=[])
-def update_repository_list(
-    chroot: Chroot,
-    user_repository: bool = False,
-    mirrors_exclude: list[str] = [],
-    check: bool = False,
-) -> None:
-    """
-    Update /etc/apk/repositories, if it is outdated (when the user changed the
-    --mirror-alpine or --mirror-pmOS parameters).
-
-    :param mirrors_exclude: mirrors to exclude from the repository list
-    :param check: This function calls it self after updating the
-                  /etc/apk/repositories file, to check if it was successful.
-                  Only for this purpose, the "check" parameter should be set to
-                  True.
-    """
-    # Read old entries or create folder structure
-    path = chroot / "etc/apk/repositories"
-    lines_old: list[str] = []
-    if path.exists():
-        # Read all old lines
-        lines_old = []
-        with path.open() as handle:
-            for line in handle:
-                lines_old.append(line[:-1])
-    else:
-        pmb.helpers.run.root(["mkdir", "-p", path.parent])
-
-    # Up to date: Save cache, return
-    lines_new = pmb.helpers.repo.urls(
-        user_repository=user_repository, mirrors_exclude=mirrors_exclude
-    )
-    if lines_old == lines_new:
-        return
-
-    # Check phase: raise error when still outdated
-    if check:
-        raise RuntimeError(f"Failed to update: {path}")
-
-    # Update the file
-    logging.debug(f"({chroot}) update /etc/apk/repositories")
-    if path.exists():
-        pmb.helpers.run.root(["rm", path])
-    for line in lines_new:
-        pmb.helpers.run.root(["sh", "-c", "echo " f"{shlex.quote(line)} >> {path}"])
-    update_repository_list(
-        chroot, user_repository=user_repository, mirrors_exclude=mirrors_exclude, check=True
-    )
 
 
 @Cache("chroot")
@@ -163,9 +110,7 @@ def packages_get_locally_built_apks(package_list: list[str], arch: Arch) -> list
         for channel in channels:
             apk_path = get_context().config.work / "packages" / channel / arch / apk_file
             if apk_path.exists():
-                # FIXME: use /mnt/pmb… until MR 2351 is reverted (pmb#2388)
-                # local.append(apk_path)
-                local.append(Path("/mnt/pmbootstrap/packages/") / channel / arch / apk_file)
+                local.append(apk_path)
                 break
 
         # Record all the packages we have visited so far
@@ -233,24 +178,17 @@ def install_run_apk(
         user_repo += ["--repository", context.config.work / "packages" / channel]
 
     for i, command in enumerate(commands):
-        # --no-interactive is a parameter to `add`, so it must be appended or apk
-        # gets confused
-        command += ["--no-interactive"]
         command = user_repo + command
 
         # Ignore missing repos before initial build (bpo#137)
         if os.getenv("PMB_APK_FORCE_MISSING_REPOSITORIES") == "1":
             command = ["--force-missing-repositories"] + command
 
-        if context.offline:
-            command = ["--no-network"] + command
-        if i == 0:
-            pmb.helpers.apk.apk_with_progress(command, chroot)
-        else:
-            # Virtual package related commands don't actually install or remove
-            # packages, but only mark the right ones as explicitly installed.
-            # They finish up almost instantly, so don't display a progress bar.
-            pmb.chroot.root(["apk", "--no-progress"] + command, chroot)
+        # Virtual package related commands don't actually install or remove
+        # packages, but only mark the right ones as explicitly installed.
+        # So only display a progress bar for the "apk add" command which is
+        # always the first one we process (i == 0).
+        pmb.helpers.apk.run(command, chroot, with_progress=(i == 0))
 
 
 def install(packages: list[str], chroot: Chroot, build: bool = True, quiet: bool = False) -> None:

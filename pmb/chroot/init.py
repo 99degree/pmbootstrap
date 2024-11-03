@@ -9,14 +9,16 @@ import os
 import pmb.chroot
 import pmb.chroot.binfmt
 import pmb.chroot.apk
-import pmb.chroot.apk_static
 import pmb.config
 import pmb.config.workdir
+import pmb.helpers.apk_static
+import pmb.helpers.apk
 import pmb.helpers.repo
 import pmb.helpers.run
 import pmb.helpers.other
 from pmb.core import Chroot, ChrootType
 from pmb.core.context import get_context
+from pmb.types import PathString
 
 
 class UsrMerge(enum.Enum):
@@ -136,33 +138,27 @@ def init(chroot: Chroot, usr_merge: UsrMerge = UsrMerge.AUTO) -> None:
     mark_in_chroot(chroot)
     if chroot.exists():
         copy_resolv_conf(chroot)
-        pmb.chroot.apk.update_repository_list(chroot)
+        pmb.helpers.apk.update_repository_list(chroot.path)
         warn_if_chroots_outdated()
         return
 
-    # Require apk-tools-static
-    pmb.chroot.apk_static.init()
+    # Fetch apk.static
+    pmb.helpers.apk_static.init()
 
     logging.info(f"({chroot}) Creating chroot")
-
-    # Initialize cache
-    apk_cache = config.work / f"cache_apk_{arch}"
-    pmb.helpers.run.root(["ln", "-s", "-f", "/var/cache/apk", chroot / "etc/apk/cache"])
 
     # Initialize /etc/apk/keys/, resolv.conf, repositories
     init_keys()
     copy_resolv_conf(chroot)
-    pmb.chroot.apk.update_repository_list(chroot)
+    pmb.helpers.apk.update_repository_list(chroot.path)
 
     pmb.config.workdir.chroot_save_init(chroot)
 
     # Install alpine-base
     pmb.helpers.repo.update(arch)
     pkgs = ["alpine-base"]
-    cmd = ["--root", chroot.path, "--cache-dir", apk_cache, "--initdb", "--arch", arch]
-    for channel in pmb.config.pmaports.all_channels():
-        cmd += ["--repository", config.work / "packages" / channel]
-    pmb.chroot.apk_static.run(cmd + ["add", *pkgs])
+    cmd: list[PathString] = ["--initdb"]
+    pmb.helpers.apk.run(cmd + ["add", *pkgs], chroot)
 
     # Merge /usr
     if usr_merge is UsrMerge.AUTO and pmb.config.is_systemd_selected(config):

@@ -50,7 +50,7 @@ class Chroot:
             "riscv64",
         ]
 
-        if self.__type not in ChrootType:
+        if self.__type not in ChrootType._member_map_.values():
             raise ValueError(f"Invalid chroot type: '{self.__type}'")
 
         # A buildroot suffix must have a name matching one of alpines

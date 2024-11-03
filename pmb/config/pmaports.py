@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 import configparser
 from pathlib import Path
-from pmb.core.pkgrepo import pkgrepo_default_path, pkgrepo_paths, pkgrepo_relative_path
+from pmb.core.pkgrepo import (
+    pkgrepo_default_path,
+    pkgrepo_name,
+    pkgrepo_paths,
+    pkgrepo_relative_path,
+)
 from pmb.helpers import logging
 import os
 import sys
@@ -97,7 +102,7 @@ def read_config(aports: Path | None = None) -> dict[str, Any]:
     if aports is None:
         aports = pkgrepo_paths()[0]
 
-    systemd = aports.name == "systemd"
+    systemd = pkgrepo_name(aports) == "systemd"
     # extra-repos don't have a pmaports.cfg
     # so jump up the main aports dir
     if "extra-repos" in aports.parts:

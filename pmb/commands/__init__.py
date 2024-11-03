@@ -47,7 +47,6 @@ unmigrated_commands = [
     "install",
     "checksum",
     "build",
-    "deviceinfo_parse",
     "apkbuild_parse",
     "apkindex_parse",
     "config",

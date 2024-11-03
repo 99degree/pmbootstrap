@@ -1,5 +1,7 @@
 # Copyright 2023 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
+import sys
+
 import pmb.config
 from pmb.core.context import Context
 from pmb.core.pkgrepo import pkgrepo_default_path
@@ -89,6 +91,7 @@ def init(args: PmbArgs) -> PmbArgs:
 
     # Initialize logs (we could raise errors below)
     pmb.helpers.logging.init(context.log, args.verbose, context.details_to_stdout)
+    pmb.helpers.logging.debug(f"Pmbootstrap v{pmb.__version__} (Python {sys.version})")
 
     # Initialization code which may raise errors
     if args.action not in [

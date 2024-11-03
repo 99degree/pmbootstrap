@@ -17,6 +17,8 @@ before_script: &global_before_scripts
   # Force IPv4 for gitlab.postmarketos.org until it supports IPv6 too, OSUOSL is
   # working on it (infra#195)
   - "echo '140.211.167.182 gitlab.postmarketos.org' >> /etc/hosts"
+  # python 3.10 tests: need to have tomli installed, see pmb/helpers/toml.py
+  - "if grep -q VERSION_ID=3\\.17 /etc/os-release; then apk add py3-tomli; fi"
 
 stages:
   - lint
@@ -45,6 +47,11 @@ pytest:
     paths:
       - "log_testsuite.txt"
       - "log.txt"
+
+# Ensure that tests pass on Python 3.10
+pytest-python3.10:
+  extends: pytest
+  image: alpine:3.17
 
 ruff:
   stage: lint
@@ -124,6 +131,11 @@ install amd64:
     - .ci/integration_tests/build_images qemu-amd64 console
   # ARM64 on AMD64
     - .ci/integration_tests/build_images postmarketos-trailblazer console
+
+# Test that building images works on Python 3.10
+install amd64 python3.10:
+  extends: install amd64
+  image: alpine:3.17
 
 install aarch64:
   extends: .integration
