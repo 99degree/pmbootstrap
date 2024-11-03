@@ -24,13 +24,6 @@ Parse a single deviceinfo and return it as JSON:
   $ pmbootstrap deviceinfo_parse pine64-pinephone
 
 
-Parse a single APKBUILD and return it as JSON:
-
-.. code-block:: shell
-
-  $ pmbootstrap apkbuild_parse hello-world
-
-
 Parse a package from an APKINDEX and return it as JSON:
 
 .. code-block:: shell
