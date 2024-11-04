@@ -232,7 +232,10 @@ def package_kernel(args: PmbArgs) -> None:
     else:
         function_body = pmb.parse.function_body(aport / "APKBUILD", "package")
         kbuild_out = find_kbuild_output_dir(function_body)
-    chroot = pmb.build.autodetect.chroot(apkbuild, arch)
+    if "pmb:cross-native" in apkbuild["options"]:
+        chroot = Chroot.native()
+    else:
+        chroot = pmb.build.autodetect.chroot(apkbuild, arch)
 
     # Install package dependencies
     depends = pmb.build.get_depends(context, apkbuild)
