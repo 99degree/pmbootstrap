@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 from . import config
 from . import parse
-from .config import init as config_init
+from .config import init as config_init, require_programs
 from .helpers import frontend
 from .helpers import logging
 from .helpers import mount
@@ -72,6 +72,9 @@ def main() -> int:
         other.check_grsec()
         if not args.as_root and os.geteuid() == 0:
             raise RuntimeError("Do not run pmbootstrap as root!")
+
+        # Check for required programs (and find their absolute paths)
+        require_programs()
 
         # Initialize or require config
         if args.action == "init":

@@ -36,11 +36,16 @@ import pmb.parse._apkbuild
 
 def require_programs() -> None:
     missing = []
-    for program in pmb.config.required_programs:
+    for program in pmb.config.required_programs.keys():
+        prog = shutil.which(program, path=pmb.config.host_path)
         # Debian: some programs are in /usr/sbin, which is not in PATH
         # unless using sudo
-        if not shutil.which(program) and not os.path.exists(os.path.join("/usr/sbin", program)):
+        if not prog:
             missing.append(program)
+        else:
+            pmb.config.required_programs[program] = prog
+
+    print(pmb.config.required_programs)
 
     losetup_missing_json = False
 
@@ -694,8 +699,6 @@ def ask_for_locale(current_locale: str) -> str:
 
 
 def frontend(args: PmbArgs) -> None:
-    require_programs()
-
     # Work folder (needs to be first, so we can create chroots early)
     config = get_context().config
 

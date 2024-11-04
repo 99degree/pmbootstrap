@@ -14,6 +14,7 @@ from collections.abc import Sequence
 from pmb.config.file import load, save, serialize
 from pmb.config.sudo import which_sudo
 from pmb.config.other import is_systemd_selected
+from .init import require_programs
 from . import workdir
 
 
@@ -58,14 +59,16 @@ ondev_min_version = "0.2.0"
 # Programs that pmbootstrap expects to be available from the host system. Keep
 # in sync with README.md, and try to keep the list as small as possible. The
 # idea is to run almost everything in Alpine chroots.
-required_programs = [
-    "git",
-    "kpartx",
-    "losetup",
-    "openssl",
-    "ps",
-    "tar",
-]
+required_programs: dict[str, str] = {
+    "git": "",
+    "kpartx": "",
+    "losetup": "",
+    "openssl": "",
+    "ps": "",
+    "tar": "",
+    "chroot": "",
+    "sh": "",
+}
 
 
 def sudo(cmd: Sequence[PathString]) -> Sequence[PathString]:
