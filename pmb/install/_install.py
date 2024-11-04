@@ -868,6 +868,10 @@ def install_system_image(
                 pmb.install.partition_cgpt(layout, size_boot, size_reserve)
             else:
                 pmb.install.partition(layout, size_boot, size_reserve)
+
+    # Inform kernel about changed partition table in case parted couldn't
+    pmb.chroot.root(["partprobe", "/dev/install"], check=False)
+
     if not split:
         pmb.install.partitions_mount(device, layout, disk)
 
