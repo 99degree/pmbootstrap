@@ -18,6 +18,111 @@ If you already ran this before, run the following to update your local clone of 
 
    $ pmbootstrap pull
 
+
+Quick health check and config overview:
+
+.. code-block:: shell
+
+   $ pmbootstrap status
+
+
+After successfully finishing the ``init`` sequence with answering all questions, its time to build the 
+installation:
+
+Devices like the PinePhone, Samsung Galaxy S II, Nokia N900, various laptops etc. can boot from an SD card, USB stick or other external storage. Find the name with lsblk first and make sure it is the right one as you will overwrite everything on it. Use a path without partition number at the end, such as /dev/mmcblk0. If your device is able to boot from SD card without flashing anything (such as the PinePhone), you should then be able to insert SD card into your device and boot it up.
+
+.. code-block:: shell
+
+   $ pmbootstrap install --sdcard=/dev/mmcblk... --fde
+
+
+For devices where you will flash directly to the internal storage, as mostly all sdm845 devices, you can build the installation as:
+
+.. code-block:: shell
+
+   $ pmbootstrap install
+
+
+or with full disk encryption:
+
+.. code-block:: shell
+
+   $ pmbootstrap install --fde
+
+and then flash it with the ``pmbootstrap flasher`` while the device is in ``fastboot`` mode:
+
+.. code-block:: shell
+
+   $ pmbootstrap flasher flash_rootfs
+
+
+and also the kernel:
+
+.. code-block:: shell
+
+   $ pmbootstrap flasher flash_kernel
+
+
+For getting images on the local machine instead of directly flashing them, execute:
+
+.. code-block:: shell
+
+   $ pmbootstrap export
+
+
+To extract the generated initramfs: 
+
+.. code-block:: shell
+
+   $ pmbootstrap initfs extract
+
+
+Build and flash Android recovery zip:
+
+.. code-block:: shell
+
+ $ pmbootstrap install --android-recovery-zip
+ $ pmbootstrap flasher --method=adb sideload
+
+
+Update existing installation on SD card:
+
+.. code-block:: shell
+
+ $ pmbootstrap install --disk=/dev/mmcblk0 --rsync
+
+
+Run the image in QEMU:
+
+.. code-block:: shell
+
+ $ pmbootstrap qemu --image-size=1G
+
+
+**Device Porting Assistance**
+
+Analyze Android boot.img files (also works with recovery OS images like TWRP):
+
+.. code-block:: shell
+
+ $ pmbootstrap bootimg_analyze ~/Downloads/twrp-3.2.1-0-fp2.img
+
+
+Check kernel configs:
+
+.. code-block:: shell
+
+ $ pmbootstrap kconfig check
+
+
+Edit a kernel config:
+
+.. code-block:: shell
+ 
+ $ pmbootstrap kconfig edit
+
+
+
 For further details on the different actions please see below and refer to the wiki-arcticle on `pmbootstrap`_.
 
 .. autoprogram:: pmb.parse:get_parser()
