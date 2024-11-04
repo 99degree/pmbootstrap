@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 import os
 from pathlib import Path, PurePath
-import shutil
 import subprocess
 from collections.abc import Sequence
 from typing import overload, Literal
@@ -21,23 +20,6 @@ from pmb.types import (
     RunOutputTypePopen,
     RunReturnType,
 )
-
-
-def executables_absolute_path():
-    """
-    Get the absolute paths to the sh and chroot executables.
-    """
-    ret = {}
-    for binary in ["sh", "chroot"]:
-        path = shutil.which(binary, path=pmb.config.chroot_host_path)
-        if not path:
-            raise RuntimeError(
-                f"Could not find the '{binary}'"
-                " executable. Make sure that it is in"
-                " your current user's PATH."
-            )
-        ret[binary] = path
-    return ret
 
 
 def rootm(
@@ -97,8 +79,8 @@ def rootm(
     # cmd: ["echo", "test"]
     # cmd_chroot: ["/sbin/chroot", "/..._native", "/bin/sh", "-c", "echo test"]
     # cmd_sudo: ["sudo", "env", "-i", "sh", "-c", "PATH=... /sbin/chroot ..."]
-    executables = executables_absolute_path()
-    cmd_chroot = [
+    executables = pmb.config.required_programs
+    cmd_chroot: list[PathString] = [
         executables["chroot"],
         chroot.path,
         "/bin/sh",
