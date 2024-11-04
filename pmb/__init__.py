@@ -19,6 +19,7 @@ from .helpers import frontend
 from .helpers import logging
 from .helpers import mount
 from .helpers import other
+from .helpers import status
 from .core import Chroot, Config
 from .core.context import get_context
 from .commands import run_command
@@ -43,6 +44,8 @@ if version < (3, 10):
 
 def print_log_hint() -> None:
     context = get_context(allow_failure=True)
+    if context and context.details_to_stdout:
+        return
     log = context.log if context else Config().work / "log.txt"
     # Hints about the log file (print to stdout only)
     log_hint = "Run 'pmbootstrap log' for details."
@@ -128,10 +131,12 @@ def main() -> int:
 
     except Exception as e:
         # Dump log to stdout when args (and therefore logging) init failed
+        can_print_status = get_context(allow_failure=True) is not None
         if "args" not in locals():
             import logging as pylogging
 
             pylogging.getLogger().setLevel(logging.DEBUG)
+            can_print_status = False
 
         logging.info("ERROR: " + str(e))
         logging.info("See also: <https://postmarketos.org/troubleshooting>")
@@ -144,6 +149,8 @@ def main() -> int:
             "Find the latest version here: https://gitlab.postmarketos.org/postmarketOS/pmbootstrap/-/tags"
         )
         print(f"Your version: {__version__}")
+        if can_print_status:
+            status.print_status()
         return 1
 
     return 0

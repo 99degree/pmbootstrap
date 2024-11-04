@@ -5,7 +5,6 @@ import pmb.config.other
 import pmb.config.workdir
 import pmb.helpers.git
 from pmb.core import Config
-from pmb.types import PmbArgs
 from pmb.core.context import get_context
 
 
@@ -23,11 +22,11 @@ def print_channel(config: Config) -> None:
 
     # Get branch name (if on branch) or current commit
     path = pmb.helpers.git.get_path("pmaports")
-    ref = pmb.helpers.git.rev_parse(path, extra_args=["--abbrev-ref"])
+    ref = pmb.helpers.git.rev_parse(path, extra_args=["--abbrev-ref"], silent=True)
     if ref == "HEAD":
-        ref = pmb.helpers.git.rev_parse(path)[0:8]
+        ref = pmb.helpers.git.rev_parse(path, silent=True)[0:8]
 
-    if not pmb.helpers.git.clean_worktree(path):
+    if not pmb.helpers.git.clean_worktree(path, silent=True):
         ref += ", dirty"
 
     value = f"{channel} (pmaports: {ref})"
@@ -52,7 +51,7 @@ def print_systemd(config: Config) -> None:
     print_status_line("systemd", f"{yesno} ({reason})")
 
 
-def print_status(args: PmbArgs) -> None:
+def print_status() -> None:
     """:param details: if True, print each passing check instead of a summary
     :returns: True if all checks passed, False otherwise"""
     config = get_context().config

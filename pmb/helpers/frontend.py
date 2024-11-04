@@ -554,7 +554,7 @@ def lint(args: PmbArgs) -> None:
 
 
 def status(args: PmbArgs) -> NoReturn:
-    pmb.helpers.status.print_status(args)
+    pmb.helpers.status.print_status()
 
     # Do not print the DONE! line
     sys.exit(0)

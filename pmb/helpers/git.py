@@ -65,7 +65,9 @@ def clone(name_repo: str) -> None:
         open(fetch_head, "w").close()
 
 
-def rev_parse(path: Path, revision: str = "HEAD", extra_args: list = []) -> str:
+def rev_parse(
+    path: Path, revision: str = "HEAD", extra_args: list = [], silent: bool = False
+) -> str:
     """Run "git rev-parse" in a specific repository dir.
 
     :param path: to the git repository
@@ -75,7 +77,7 @@ def rev_parse(path: Path, revision: str = "HEAD", extra_args: list = []) -> str:
         or (with ``--abbrev-ref``): the branch name, e.g. "master"
     """
     command = ["git", "rev-parse"] + extra_args + [revision]
-    rev = pmb.helpers.run.user_output(command, path)
+    rev = pmb.helpers.run.user_output(command, path, output="null" if silent else "log")
     return rev.rstrip()
 
 
@@ -90,10 +92,10 @@ def can_fast_forward(path: Path, branch_upstream: str, branch: str = "HEAD") -> 
         raise RuntimeError("Unexpected exit code from git: " + str(ret))
 
 
-def clean_worktree(path: Path) -> bool:
+def clean_worktree(path: Path, silent: bool = False) -> bool:
     """Check if there are not any modified files in the git dir."""
     command = ["git", "status", "--porcelain"]
-    return pmb.helpers.run.user_output(command, path) == ""
+    return pmb.helpers.run.user_output(command, path, output="null" if silent else "log") == ""
 
 
 def list_remotes(aports: Path) -> list[str]:
