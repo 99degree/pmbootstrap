@@ -205,7 +205,7 @@ def command_qemu(
                 ]
             )
         ]
-        command += [chroot_native / "usr/bin" / f"qemu-system-{arch}"]
+        command += [chroot_native / "usr/bin" / f"qemu-system-{arch.qemu()}"]
         command += ["-L", chroot_native / "usr/share/qemu/"]
 
     command += ["-nodefaults"]
@@ -248,6 +248,9 @@ def command_qemu(
         command += ["-device", "virtio-gpu-pci"]
     elif arch == Arch.riscv64:
         command += ["-M", "virt"]
+        command += ["-device", "virtio-gpu-pci"]
+    elif arch == Arch.ppc64le:
+        command += ["-M", "pseries"]
         command += ["-device", "virtio-gpu-pci"]
     else:
         raise RuntimeError(f"Architecture {arch} not supported by this command" " yet.")

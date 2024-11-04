@@ -83,6 +83,7 @@ class Arch(enum.Enum):
                 Arch.x86_64,
                 Arch.x86,
                 Arch.riscv64,
+                Arch.ppc64le,
                 Arch.native(),
             ]
         )
@@ -107,6 +108,7 @@ class Arch(enum.Enum):
             Arch.x86: "i386",
             Arch.armhf: "arm",
             Arch.armv7: "arm",
+            Arch.ppc64le: "ppc64",
         }
         return mapping.get(self, self.value)
 
